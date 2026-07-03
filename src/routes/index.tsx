@@ -9,6 +9,8 @@ import { StudentBasicDetailsForm } from '../pages/StudentBasicDetailsForm';
 import { FirstYearDataForm } from '../pages/FirstYearDataForm';
 import { SuccessPage } from '../pages/SuccessPage';
 import { AdminDashboard } from '../pages/AdminDashboard';
+import { DocumentUploadForm } from '../pages/DocumentUploadForm';
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -20,6 +22,7 @@ export const router = createBrowserRouter([
       { path: 'dashboard', element: <StudentDashboard /> },
       { path: 'form/basic-details', element: <StudentBasicDetailsForm /> },
       { path: 'form/first-year-data', element: <FirstYearDataForm /> },
+      { path: 'form/documents', element: <DocumentUploadForm /> },
       { path: 'form/success', element: <SuccessPage /> },
       { path: 'admin/dashboard', element: <AdminDashboard /> },
     ]

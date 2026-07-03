@@ -57,3 +57,21 @@ export const firstYearDataSchema = z.object({
 });
 
 export type FirstYearDataFormData = z.infer<typeof firstYearDataSchema>;
+
+export const documentUploadSchema = z.object({
+  tenth_marksheet: z.string().min(1, "10th Mark sheet is required"),
+  twelfth_marksheet: z.string().min(1, "12th Mark sheet is required"),
+  tc: z.string().min(1, "Transfer Certificate (TC) is required"),
+  community_certificate: z.string().min(1, "Community Certificate is required"),
+  aadhar: z.string().min(1, "Aadhar is required"),
+  photo: z.string().min(1, "Passport size photo is required"),
+  sign: z.string().min(1, "Signature is required"),
+  
+  // Optional fields
+  eleventh_marksheet: z.string().optional(),
+  migration_certificate: z.string().optional(),
+  first_graduate_certificate: z.string().optional(),
+  nativity_certificate: z.string().optional(),
+});
+
+export type DocumentUploadFormData = z.infer<typeof documentUploadSchema>;

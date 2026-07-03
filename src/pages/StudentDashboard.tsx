@@ -11,6 +11,7 @@ export const StudentDashboard = () => {
   const [folderNumber, setFolderNumber] = useState<string | null>(null);
   const [form1Status, setForm1Status] = useState<'Not Started' | 'Pending' | 'Completed'>('Not Started');
   const [form2Status, setForm2Status] = useState<'Not Started' | 'Pending' | 'Completed'>('Not Started');
+  const [form3Status, setForm3Status] = useState<'Not Started' | 'Pending' | 'Completed'>('Not Started');
 
   useEffect(() => {
     const fn = localStorage.getItem('student_folder_number');
@@ -30,6 +31,14 @@ export const StudentDashboard = () => {
 
         const { data: fData } = await supabase.from('first_year_data').select('status').eq('folder_number', fn).single();
         if (fData) setForm2Status(fData.status === 'submitted' ? 'Completed' : 'Pending');
+
+        const { count } = await supabase.from('student_documents').select('*', { count: 'exact', head: true }).eq('folder_number', fn);
+        if (count && count >= 7) {
+          // Assuming 7 mandatory docs
+          setForm3Status('Completed');
+        } else if (count && count > 0) {
+          setForm3Status('Pending');
+        }
       } catch (err) {
         console.error("Error fetching status", err);
       }
@@ -40,7 +49,7 @@ export const StudentDashboard = () => {
   if (!folderNumber) return null;
 
   return (
-    <div className="flex flex-col max-w-5xl mx-auto py-8">
+    <div className="flex flex-col max-w-6xl mx-auto py-8">
       <div className="mb-4">
         <Button variant="ghost" onClick={() => navigate('/access')} className="text-text-secondary hover:text-white -ml-4">
           <ArrowLeft className="w-4 h-4 mr-2" /> Exit Dashboard
@@ -109,6 +118,33 @@ export const StudentDashboard = () => {
           
           <Button variant="secondary" onClick={() => navigate('/form/first-year-data')} className="w-full group">
             {form2Status === 'Completed' ? 'Edit Form' : 'Start Form'}
+            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </Card>
+
+        {/* Form 3 Card */}
+        <Card className="flex flex-col">
+          <div className="flex items-start justify-between mb-6">
+            <div className="w-12 h-12 bg-purple-500/20 text-purple-400 rounded-xl flex items-center justify-center">
+              <FileText className="w-6 h-6" />
+            </div>
+            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${
+              form3Status === 'Completed' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 
+              form3Status === 'Pending' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : 
+              'bg-white/5 text-text-secondary border-white/10'
+            }`}>
+              {form3Status === 'Completed' ? <CheckCircle className="w-3.5 h-3.5" /> : form3Status === 'Pending' ? <Clock className="w-3.5 h-3.5" /> : null} 
+              {form3Status}
+            </div>
+          </div>
+          
+          <h3 className="text-xl font-bold mb-2">Document Uploads</h3>
+          <p className="text-sm text-text-secondary mb-8 flex-1">
+            Upload mandatory certificates (10th, 12th, TC, Community, etc.) as PDFs or Images (Max 5MB).
+          </p>
+          
+          <Button variant="secondary" onClick={() => navigate('/form/documents')} className="w-full group">
+            {form3Status === 'Completed' ? 'Edit Uploads' : 'Start Uploads'}
             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
         </Card>
