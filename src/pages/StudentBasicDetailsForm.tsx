@@ -181,7 +181,7 @@ export const StudentBasicDetailsForm = () => {
                 <div className="grid md:grid-cols-2 gap-6">
                   <Input label="Primary Email Address" type="email" {...register('email')} error={errors.email?.message} required />
                   <Input label="Folder Number" placeholder="DDMM/Branch/Quota/001" {...register('folder_number')} error={errors.folder_number?.message} required />
-                  <Input label="Mobile Number" type="tel" maxLength={10} {...register('mobile_number')} error={errors.mobile_number?.message} required />
+                  <Input label="Mobile Number" type="tel" maxLength={10} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('mobile_number')} error={errors.mobile_number?.message} required />
                   <Input label="Alternate Email ID" type="email" {...register('email_id')} error={errors.email_id?.message} required />
                   
                   <Select 
@@ -254,7 +254,7 @@ export const StudentBasicDetailsForm = () => {
               {currentStep === 2 && (
                 <div className="grid md:grid-cols-2 gap-6">
                   <Input label="Father/Guardian Name" {...register('father_name')} error={errors.father_name?.message} required />
-                  <Input label="Father/Guardian Mobile" type="tel" maxLength={10} {...register('father_mobile')} error={errors.father_mobile?.message} required />
+                  <Input label="Father/Guardian Mobile" type="tel" maxLength={10} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('father_mobile')} error={errors.father_mobile?.message} required />
                   
                   <Select 
                     label="Community" 

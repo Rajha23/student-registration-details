@@ -204,8 +204,8 @@ export const FirstYearDataForm = () => {
                   <Select label="Admission Category" {...register('admission_category')} error={errors.admission_category?.message} required options={[{ value: 'Management Quota', label: 'Management Quota' }, { value: 'Government Quota (Counseling)', label: 'Government Quota (Counseling)' }]} />
                   <Input label="Application/Allotment Number" {...register('application_number')} error={errors.application_number?.message} required />
                   
-                  <Input label="Mobile Number" type="tel" maxLength={10} {...register('mobile_number')} error={errors.mobile_number?.message} required />
-                  <Input label="Alternative Number" type="tel" maxLength={10} {...register('alternative_number')} error={errors.alternative_number?.message} />
+                  <Input label="Mobile Number" type="tel" maxLength={10} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('mobile_number')} error={errors.mobile_number?.message} required />
+                  <Input label="Alternative Number" type="tel" maxLength={10} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('alternative_number')} error={errors.alternative_number?.message} />
                   
                   <Input label="Email ID" type="email" {...register('email_id')} error={errors.email_id?.message} required className="md:col-span-2" />
                   
@@ -222,10 +222,10 @@ export const FirstYearDataForm = () => {
               {currentStep === 1 && (
                 <div className="grid md:grid-cols-2 gap-6">
                   <Input label="Father Name" {...register('father_name')} error={errors.father_name?.message} required />
-                  <Input label="Father's Mobile Number" type="tel" maxLength={10} {...register('father_mobile')} error={errors.father_mobile?.message} required />
+                  <Input label="Father's Mobile Number" type="tel" maxLength={10} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('father_mobile')} error={errors.father_mobile?.message} required />
                   
                   <Input label="Mother Name" {...register('mother_name')} error={errors.mother_name?.message} required />
-                  <Input label="Mother's Mobile Number" type="tel" maxLength={10} {...register('mother_mobile')} error={errors.mother_mobile?.message} required />
+                  <Input label="Mother's Mobile Number" type="tel" maxLength={10} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('mother_mobile')} error={errors.mother_mobile?.message} required />
                   
                   <Select label="Single Parent" {...register('single_parent')} error={errors.single_parent?.message} required options={[{ value: 'Yes', label: 'Yes' }, { value: 'No', label: 'No' }]} />
                   <Input label="Parents Occupation" {...register('parents_occupation')} error={errors.parents_occupation?.message} required />
