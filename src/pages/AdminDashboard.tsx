@@ -294,8 +294,7 @@ export const AdminDashboard = () => {
                         View Profile
                       </Button>
                       <Button 
-                        variant="ghost" 
-                        className="text-blue-500 hover:text-blue-400 px-3 py-1 mr-2" 
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 mr-2 h-8 text-sm" 
                         onClick={() => { setSelectedFolderNumber(student.folder_number); setPrintMode(true); }}
                       >
                         Print
