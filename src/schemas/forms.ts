@@ -48,6 +48,8 @@ export const documentUploadSchema = z.object({
   community_certificate: z.string().min(1, "Community Certificate is required"),
   aadhar: z.string().min(1, "Aadhar is required"),
   photo: z.string().min(1, "Passport size photo is required"),
+  father_photo: z.string().min(1, "Father's photo is required"),
+  mother_photo: z.string().min(1, "Mother's photo is required"),
   sign: z.string().min(1, "Signature is required"),
   
   // Optional fields

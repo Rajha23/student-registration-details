@@ -214,7 +214,9 @@ export const DocumentUploadForm = () => {
             <FileUploadItem label="Transfer Certificate (TC)" id="tc" required value={watch('tc')} onChange={(v) => setValue('tc', v, { shouldValidate: true })} error={errors.tc?.message} />
             <FileUploadItem label="Community Certificate" id="community_certificate" required value={watch('community_certificate')} onChange={(v) => setValue('community_certificate', v, { shouldValidate: true })} error={errors.community_certificate?.message} />
             <FileUploadItem label="Aadhar Card" id="aadhar" required value={watch('aadhar')} onChange={(v) => setValue('aadhar', v, { shouldValidate: true })} error={errors.aadhar?.message} />
-            <FileUploadItem label="Passport Size Photo" id="photo" required value={watch('photo')} onChange={(v) => setValue('photo', v, { shouldValidate: true })} error={errors.photo?.message} />
+            <FileUploadItem label="Student Passport Size Photo" id="photo" required value={watch('photo')} onChange={(v) => setValue('photo', v, { shouldValidate: true })} error={errors.photo?.message} />
+            <FileUploadItem label="Father's Photo" id="father_photo" required value={watch('father_photo')} onChange={(v) => setValue('father_photo', v, { shouldValidate: true })} error={errors.father_photo?.message} />
+            <FileUploadItem label="Mother's Photo" id="mother_photo" required value={watch('mother_photo')} onChange={(v) => setValue('mother_photo', v, { shouldValidate: true })} error={errors.mother_photo?.message} />
             <FileUploadItem label="Signature" id="sign" required value={watch('sign')} onChange={(v) => setValue('sign', v, { shouldValidate: true })} error={errors.sign?.message} />
           </div>
         </Card>
