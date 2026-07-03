@@ -50,9 +50,9 @@ export const firstYearDataSchema = z.object({
   caste_name: z.string().min(1, "Caste Name is required"),
   community_certificate_number: z.string().startsWith("TN-", "Must start with TN-"),
   annual_income: z.string().min(1, "Annual Income is required"),
-  income_certificate_number: z.string().optional(),
+  income_certificate_number: z.string().refine(val => !val || val.startsWith("TN-"), "Must start with TN-").optional(),
   first_graduate: z.string().min(1, "Please select Yes or No"),
-  first_graduate_certificate_number: z.string().optional(),
+  first_graduate_certificate_number: z.string().refine(val => !val || val.startsWith("TN-"), "Must start with TN-").optional(),
   emis_number: z.string().min(1, "EMIS Number is required"),
 });
 
