@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, Printer } from 'lucide-react';
 import { supabase } from '../../supabase/client';
+import { PrintableReport } from './PrintableReport';
 
 interface StudentProfileModalProps {
   folderNumber: string;
@@ -12,6 +13,7 @@ export const StudentProfileModal = ({ folderNumber, onClose }: StudentProfileMod
   const [isLoading, setIsLoading] = useState(true);
   const [firstYearData, setFirstYearData] = useState<any>(null);
   const [documentsData, setDocumentsData] = useState<any[]>([]);
+  const [isPrinting, setIsPrinting] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -60,6 +62,14 @@ export const StudentProfileModal = ({ folderNumber, onClose }: StudentProfileMod
     fetchProfile();
   }, [folderNumber]);
 
+  const handlePrint = () => {
+    setIsPrinting(true);
+    setTimeout(() => {
+      window.print();
+      setIsPrinting(false);
+    }, 100); // Give DOM time to render the print view
+  };
+
   const Field = ({ label, value }: { label: string, value: string | undefined | null }) => (
     <div className="bg-white/5 p-3 rounded-lg border border-white/5">
       <p className="text-xs text-text-secondary uppercase tracking-wider mb-1">{label}</p>
@@ -67,9 +77,17 @@ export const StudentProfileModal = ({ folderNumber, onClose }: StudentProfileMod
     </div>
   );
 
+  if (isPrinting) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-white overflow-auto print:static print:bg-transparent print:overflow-visible">
+        <PrintableReport basicData={firstYearData} firstYearData={firstYearData} documentsData={documentsData} />
+      </div>
+    );
+  }
+
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 print:hidden">
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -89,12 +107,23 @@ export const StudentProfileModal = ({ folderNumber, onClose }: StudentProfileMod
               <h2 className="text-2xl font-bold">Student Profile</h2>
               <p className="text-text-secondary">Folder: <span className="font-mono text-white">{folderNumber}</span></p>
             </div>
-            <button 
-              onClick={onClose}
-              className="p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-3">
+              {!isLoading && firstYearData && (
+                <button
+                  onClick={handlePrint}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+                >
+                  <Printer className="w-4 h-4" />
+                  Print Report
+                </button>
+              )}
+              <button 
+                onClick={onClose}
+                className="p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
