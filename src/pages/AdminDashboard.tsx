@@ -89,15 +89,53 @@ export const AdminDashboard = () => {
     }
   };
 
-  const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(students);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const generateExportData = async () => {
+    setIsExporting(true);
+    try {
+      const { data: basicData } = await supabase.from('student_basic_details').select('*');
+      const { data: fydData } = await supabase.from('first_year_data').select('*');
+      
+      if (!basicData) return [];
+
+      return basicData.map(basic => {
+        const fyd = (fydData || []).find(f => f.folder_number === basic.folder_number) || {};
+        
+        // Exclude system fields for a cleaner export
+        const { id: _id1, created_at: _ca1, updated_at: _ua1, status: _s1, ...cleanBasic } = basic;
+        const { id: _id2, created_at: _ca2, updated_at: _ua2, status: _s2, folder_number: _fn, ...cleanFyd } = fyd;
+
+        return {
+          "Folder Number": basic.folder_number,
+          "Status": basic.status,
+          "Registration Date": new Date(basic.created_at).toLocaleString(),
+          ...cleanBasic,
+          ...cleanFyd
+        };
+      });
+    } catch (err) {
+      console.error("Error generating export data", err);
+      alert("Failed to gather data for export.");
+      return [];
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const exportToExcel = async () => {
+    const data = await generateExportData();
+    if (data.length === 0) return;
+    const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
     XLSX.writeFile(workbook, "Student_Registrations.xlsx");
   };
 
-  const exportToCSV = () => {
-    const worksheet = XLSX.utils.json_to_sheet(students);
+  const exportToCSV = async () => {
+    const data = await generateExportData();
+    if (data.length === 0) return;
+    const worksheet = XLSX.utils.json_to_sheet(data);
     const csv = XLSX.utils.sheet_to_csv(worksheet);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -129,10 +167,10 @@ export const AdminDashboard = () => {
           <p className="text-text-secondary">Overview of all student registrations and statistics.</p>
         </div>
         <div className="flex gap-4">
-          <Button variant="secondary" onClick={exportToCSV}>
+          <Button variant="secondary" onClick={exportToCSV} isLoading={isExporting}>
             <Download className="w-4 h-4 mr-2" /> Export CSV
           </Button>
-          <Button onClick={exportToExcel} className="bg-green-600 hover:bg-green-700">
+          <Button onClick={exportToExcel} className="bg-green-600 hover:bg-green-700" isLoading={isExporting}>
             <Download className="w-4 h-4 mr-2" /> Export Excel
           </Button>
         </div>
