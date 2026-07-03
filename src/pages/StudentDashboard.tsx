@@ -116,7 +116,7 @@ export const StudentDashboard = () => {
             Detailed module for first-year students including family, community, and income details. Requires Form 1 completion.
           </p>
           
-          <Button variant="secondary" onClick={() => navigate('/form/first-year-data')} className="w-full group">
+          <Button onClick={() => navigate('/form/first-year-data')} className="w-full group">
             {form2Status === 'Completed' ? 'Edit Form' : 'Start Form'}
             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
@@ -143,7 +143,7 @@ export const StudentDashboard = () => {
             Upload mandatory certificates (10th, 12th, TC, Community, etc.) as PDFs or Images (Max 5MB).
           </p>
           
-          <Button variant="secondary" onClick={() => navigate('/form/documents')} className="w-full group">
+          <Button onClick={() => navigate('/form/documents')} className="w-full group">
             {form3Status === 'Completed' ? 'Edit Uploads' : 'Start Uploads'}
             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>

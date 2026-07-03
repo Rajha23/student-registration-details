@@ -28,8 +28,7 @@ VALUES ('student_certificates', 'student_certificates', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- 3. Set up Storage Policies to allow public uploads and reads
--- Enable RLS on storage objects
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+-- (RLS is already enabled on storage.objects by default)
 
 DROP POLICY IF EXISTS "Anyone can read certificates" ON storage.objects;
 CREATE POLICY "Anyone can read certificates" 
