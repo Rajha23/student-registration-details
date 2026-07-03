@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Search, Users, FileCheck, Clock, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Download, Search, Users, FileCheck, Clock, CheckCircle, ArrowLeft, Trash2 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -62,6 +62,30 @@ export const AdminDashboard = () => {
       console.error("Error fetching data", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (folderNumber: string) => {
+    if (!window.confirm(`Are you sure you want to permanently delete the registration for Folder No. ${folderNumber}? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('student_basic_details')
+        .delete()
+        .eq('folder_number', folderNumber);
+
+      if (error) {
+        alert("Failed to delete record: " + error.message);
+      } else {
+        setStudents(prev => prev.filter(s => s.folder_number !== folderNumber));
+        // Recalculate stats entirely to be safe
+        fetchData();
+        alert("Record deleted successfully.");
+      }
+    } catch (err) {
+      alert("An unexpected error occurred while deleting.");
     }
   };
 
@@ -199,7 +223,10 @@ export const AdminDashboard = () => {
                       </span>
                     </td>
                     <td className="p-4 text-right">
-                      <Button variant="ghost" className="text-primary hover:text-white px-3 py-1" onClick={() => setSelectedFolderNumber(student.folder_number)}>View Profile</Button>
+                      <Button variant="ghost" className="text-primary hover:text-white px-3 py-1 mr-2" onClick={() => setSelectedFolderNumber(student.folder_number)}>View Profile</Button>
+                      <Button variant="ghost" className="text-red-500 hover:text-red-400 hover:bg-red-500/10 px-2 py-1" onClick={() => handleDelete(student.folder_number)} title="Delete Record">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </td>
                   </tr>
                 ))
