@@ -226,8 +226,9 @@ export const DocumentUploadForm = () => {
           <div className="grid md:grid-cols-2 gap-6">
             <FileUploadItem label="11th Mark Sheet" id="eleventh_marksheet" value={watch('eleventh_marksheet')} onChange={(v) => setValue('eleventh_marksheet', v)} />
             <FileUploadItem label="Migration Certificate" id="migration_certificate" value={watch('migration_certificate')} onChange={(v) => setValue('migration_certificate', v)} />
-            <FileUploadItem label="First Graduate Certificate" id="first_graduate_certificate" value={watch('first_graduate_certificate')} onChange={(v) => setValue('first_graduate_certificate', v)} />
-            <FileUploadItem label="Nativity Certificate" id="nativity_certificate" value={watch('nativity_certificate')} onChange={(v) => setValue('nativity_certificate', v)} />
+            <FileUploadItem label="First Graduate Certificate" id="first_graduate_certificate" value={watch('first_graduate_certificate')} onChange={(v) => setValue('first_graduate_certificate', v, { shouldValidate: true })} />
+            <FileUploadItem label="Nativity Certificate" id="nativity_certificate" value={watch('nativity_certificate')} onChange={(v) => setValue('nativity_certificate', v, { shouldValidate: true })} />
+            <FileUploadItem label="Income Certificate" id="income_certificate" value={watch('income_certificate')} onChange={(v) => setValue('income_certificate', v, { shouldValidate: true })} />
           </div>
         </Card>
 

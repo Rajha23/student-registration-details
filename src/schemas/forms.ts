@@ -57,6 +57,7 @@ export const documentUploadSchema = z.object({
   migration_certificate: z.string().optional(),
   first_graduate_certificate: z.string().optional(),
   nativity_certificate: z.string().optional(),
+  income_certificate: z.string().optional(),
 });
 
 export type DocumentUploadFormData = z.infer<typeof documentUploadSchema>;
