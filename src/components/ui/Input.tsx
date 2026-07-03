@@ -24,7 +24,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className={`
               w-full bg-background/50 border rounded-lg px-4 py-3 text-text 
               placeholder-text-secondary/50 focus:outline-none focus:ring-2 
-              transition-all duration-200
+              transition-all duration-200 [color-scheme:dark]
               ${error 
                 ? 'border-red-500 focus:ring-red-500/50 focus:border-red-500' 
                 : 'border-white/10 focus:ring-primary/50 focus:border-primary'}
