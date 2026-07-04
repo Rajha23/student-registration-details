@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Upload, File, CheckCircle, ArrowLeft, Loader2, Plus } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -26,7 +26,8 @@ const FileUploadItem = ({
   error?: string 
 }) => {
   const [isUploading, setIsUploading] = useState(false);
-  const folderNumber = localStorage.getItem('student_folder_number');
+  const [searchParams] = useSearchParams();
+  const folderNumber = searchParams.get('adminEditFolder') || localStorage.getItem('student_folder_number');
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -122,7 +123,9 @@ const FileUploadItem = ({
 
 export const DocumentUploadForm = () => {
   const navigate = useNavigate();
-  const folderNumber = localStorage.getItem('student_folder_number');
+  const [searchParams] = useSearchParams();
+  const adminEditFolder = searchParams.get('adminEditFolder');
+  const folderNumber = adminEditFolder || localStorage.getItem('student_folder_number');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [otherDocs, setOtherDocs] = useState<{id: string, name: string, url: string}[]>([]);
   const [newDocName, setNewDocName] = useState('');
@@ -178,8 +181,14 @@ export const DocumentUploadForm = () => {
       // we just need to ensure all required fields are filled, which Zod does for us.
       
       // Update form 3 status in basic details if we wanted to track it, but we can just mark form 3 complete in our app logic by checking if documents exist.
-      alert("Documents submitted successfully!");
-      navigate('/dashboard');
+      
+      if (adminEditFolder) {
+        alert("Documents saved successfully!");
+        navigate('/admin/dashboard');
+      } else {
+        alert("Documents submitted successfully!");
+        navigate('/dashboard'); 
+      }
     } catch (error) {
       console.error(error);
       alert('An error occurred during submission.');
@@ -191,14 +200,14 @@ export const DocumentUploadForm = () => {
   return (
     <div className="flex flex-col max-w-4xl mx-auto py-8">
       <div className="mb-6">
-        <Button variant="ghost" onClick={() => navigate('/dashboard')} className="text-text-secondary hover:text-white -ml-4">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
+        <Button variant="ghost" onClick={() => navigate(adminEditFolder ? '/admin/dashboard' : '/dashboard')} className="text-text-secondary hover:text-white -ml-4">
+          <ArrowLeft className="w-4 h-4 mr-2" /> {adminEditFolder ? 'Back to Admin Dashboard' : 'Back to Dashboard'}
         </Button>
       </div>
 
       <div className="mb-10 text-center">
-        <h1 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-          Document Uploads
+        <h1 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent flex items-center justify-center gap-2">
+          {adminEditFolder && <span className="text-yellow-500 text-2xl font-bold">[ADMIN MODE]</span>} Document Uploads
         </h1>
         <p className="text-text-secondary">
           Please upload your certificates and documents. Accepted formats: PDF, PNG, JPG (Max 5MB per file).

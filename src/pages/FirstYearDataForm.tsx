@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Save, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -18,6 +18,9 @@ const STEPS = ['Personal Details', 'Family Details', 'Community, Income & School
 
 export const FirstYearDataForm = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const adminEditFolder = searchParams.get('adminEditFolder');
+  
   const [folderNumber, setFolderNumber] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
@@ -170,7 +173,7 @@ export const FirstYearDataForm = () => {
 
   // Load draft data on mount
   useEffect(() => {
-    const fn = localStorage.getItem('student_folder_number');
+    const fn = adminEditFolder || localStorage.getItem('student_folder_number');
     if (!fn) {
       navigate('/access');
       return;
@@ -197,7 +200,7 @@ export const FirstYearDataForm = () => {
       }
     };
     loadDraft();
-  }, [navigate, setValue]);
+  }, [navigate, setValue, adminEditFolder]);
 
   const handleNext = async () => {
     let fieldsToValidate: any[] = [];
@@ -270,7 +273,11 @@ export const FirstYearDataForm = () => {
     const isConfigured = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
     if (!isConfigured) {
       setTimeout(() => {
-        navigate('/form/success');
+        if (adminEditFolder) {
+          navigate(`/form/documents?adminEditFolder=${encodeURIComponent(adminEditFolder)}`);
+        } else {
+          navigate('/form/documents');
+        }
       }, 1000);
       return;
     }
@@ -285,7 +292,12 @@ export const FirstYearDataForm = () => {
         }, { onConflict: 'folder_number' });
         
       if (error) throw error;
-      navigate('/form/success');
+      
+      if (adminEditFolder) {
+        navigate(`/form/documents?adminEditFolder=${encodeURIComponent(adminEditFolder)}`);
+      } else {
+        navigate('/form/documents');
+      }
     } catch (err: any) {
       alert("Error submitting form: " + err.message);
     } finally {
@@ -308,14 +320,18 @@ export const FirstYearDataForm = () => {
   return (
     <div className="max-w-4xl mx-auto py-8 relative">
       <div className="mb-4">
-        <Button variant="ghost" onClick={() => navigate('/dashboard')} className="text-text-secondary hover:text-white -ml-4">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
+        <Button variant="ghost" onClick={() => navigate(adminEditFolder ? '/admin/dashboard' : '/dashboard')} className="text-text-secondary hover:text-white -ml-4">
+          <ArrowLeft className="w-4 h-4 mr-2" /> {adminEditFolder ? 'Back to Admin Dashboard' : 'Back to Dashboard'}
         </Button>
       </div>
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">First Year Data 2026-27</h1>
-        <p className="text-text-secondary">Please provide your family, community, and income details.</p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
+            {adminEditFolder && <span className="text-yellow-500 text-2xl font-bold">[ADMIN MODE]</span>} First Year Data 2026-27
+          </h1>
+          <p className="text-text-secondary">Please provide your family, community, and income details.</p>
+        </div>
       </div>
 
       <Card className="mb-8 p-4 md:p-8">

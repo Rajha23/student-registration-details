@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Search, Users, FileCheck, Clock, CheckCircle, ArrowLeft, Trash2 } from 'lucide-react';
+import { Download, Search, Users, FileCheck, Clock, CheckCircle, ArrowLeft, Trash2, Edit } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -361,6 +361,14 @@ export const AdminDashboard = () => {
                         onClick={() => { setSelectedFolderNumber(student.folder_number); setPrintMode(true); }}
                       >
                         Print
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        className="text-yellow-500 hover:text-yellow-400 hover:bg-yellow-500/10 px-2 py-1 mr-2" 
+                        onClick={() => navigate(`/form/first-year-data?adminEditFolder=${encodeURIComponent(student.folder_number)}`)} 
+                        title="Edit Record"
+                      >
+                        <Edit className="w-4 h-4" />
                       </Button>
                       <Button variant="ghost" className="text-red-500 hover:text-red-400 hover:bg-red-500/10 px-2 py-1" onClick={() => handleDelete(student.folder_number)} title="Delete Record">
                         <Trash2 className="w-4 h-4" />
