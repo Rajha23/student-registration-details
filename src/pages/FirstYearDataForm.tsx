@@ -579,22 +579,22 @@ export const FirstYearDataForm = () => {
                           <Input label="Total Mark (Out of 600)" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_total_marks')} error={errors.twelfth_total_marks?.message} required className="bg-primary/5" />
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-6 mb-4 p-4 bg-white/5 rounded-lg border border-white/5">
-                          <div>
+                        <div className="grid md:grid-cols-2 gap-x-8 gap-y-4 mb-4 p-4 bg-white/5 rounded-lg border border-white/5">
+                          <div className="grid grid-cols-2 gap-4">
                             <Input label="Subject 1 Name" placeholder="e.g. Physics" {...register('twelfth_sub1_name')} error={errors.twelfth_sub1_name?.message} required />
-                            <div className="mt-2"><Input label="Subject 1 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub1_mark')} error={errors.twelfth_sub1_mark?.message} required /></div>
+                            <Input label="Subject 1 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub1_mark')} error={errors.twelfth_sub1_mark?.message} required />
                           </div>
-                          <div>
+                          <div className="grid grid-cols-2 gap-4">
                             <Input label="Subject 2 Name" placeholder="e.g. Chemistry" {...register('twelfth_sub2_name')} error={errors.twelfth_sub2_name?.message} required />
-                            <div className="mt-2"><Input label="Subject 2 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub2_mark')} error={errors.twelfth_sub2_mark?.message} required /></div>
+                            <Input label="Subject 2 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub2_mark')} error={errors.twelfth_sub2_mark?.message} required />
                           </div>
-                          <div>
+                          <div className="grid grid-cols-2 gap-4">
                             <Input label="Subject 3 Name" placeholder="e.g. Maths" {...register('twelfth_sub3_name')} error={errors.twelfth_sub3_name?.message} required />
-                            <div className="mt-2"><Input label="Subject 3 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub3_mark')} error={errors.twelfth_sub3_mark?.message} required /></div>
+                            <Input label="Subject 3 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub3_mark')} error={errors.twelfth_sub3_mark?.message} required />
                           </div>
-                          <div>
+                          <div className="grid grid-cols-2 gap-4">
                             <Input label="Subject 4 Name" placeholder="e.g. Computer Science" {...register('twelfth_sub4_name')} error={errors.twelfth_sub4_name?.message} required />
-                            <div className="mt-2"><Input label="Subject 4 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub4_mark')} error={errors.twelfth_sub4_mark?.message} required /></div>
+                            <Input label="Subject 4 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub4_mark')} error={errors.twelfth_sub4_mark?.message} required />
                           </div>
                         </div>
                       </div>
