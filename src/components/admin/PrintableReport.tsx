@@ -20,7 +20,7 @@ export const PrintableReport = ({ basicData, firstYearData, documentsData }: Pri
       {/* Header */}
       <div className="text-center border-b-2 border-black pb-4 mb-6">
         <h1 className="text-3xl font-bold uppercase mb-2">Student Registration Report</h1>
-        <p className="text-gray-800 text-lg">Folder Number: <strong>{basicData?.folder_number}</strong></p>
+        <p className="text-gray-800 text-lg">Application Number: <strong>{basicData?.application_number}</strong></p>
       </div>
 
       {/* Photos Section */}

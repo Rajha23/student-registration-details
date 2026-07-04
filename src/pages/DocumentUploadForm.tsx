@@ -27,11 +27,11 @@ const FileUploadItem = ({
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [searchParams] = useSearchParams();
-  const folderNumber = searchParams.get('adminEditFolder') || localStorage.getItem('student_folder_number');
+  const applicationNumber = searchParams.get('adminEditApp') || localStorage.getItem('student_application_number');
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !folderNumber) return;
+    if (!file || !applicationNumber) return;
 
     if (file.size > 5 * 1024 * 1024) {
       alert("File size exceeds 5MB limit.");
@@ -41,7 +41,7 @@ const FileUploadItem = ({
     setIsUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${folderNumber}/${id}_${Date.now()}.${fileExt}`;
+      const fileName = `${applicationNumber}/${id}_${Date.now()}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
         .from('student_certificates')
@@ -57,7 +57,7 @@ const FileUploadItem = ({
 
       // Save to db, ignoring duplicates natively
       await supabase.from('student_documents').insert({
-        folder_number: folderNumber,
+        application_number: applicationNumber,
         document_type: id,
         document_name: label,
         file_url: urlData.publicUrl
@@ -72,10 +72,10 @@ const FileUploadItem = ({
   };
 
   const handleRemove = async () => {
-    if (!folderNumber || !value) return;
+    if (!applicationNumber || !value) return;
     try {
       // Best effort cleanup in DB
-      await supabase.from('student_documents').delete().match({ folder_number: folderNumber, file_url: value });
+      await supabase.from('student_documents').delete().match({ application_number: applicationNumber, file_url: value });
     } catch (e) {}
     onChange('');
   };
@@ -124,8 +124,8 @@ const FileUploadItem = ({
 export const DocumentUploadForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const adminEditFolder = searchParams.get('adminEditFolder');
-  const folderNumber = adminEditFolder || localStorage.getItem('student_folder_number');
+  const adminEditApp = searchParams.get('adminEditApp');
+  const applicationNumber = adminEditApp || localStorage.getItem('student_application_number');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [otherDocs, setOtherDocs] = useState<{id: string, name: string, url: string}[]>([]);
   const [newDocName, setNewDocName] = useState('');
@@ -136,19 +136,19 @@ export const DocumentUploadForm = () => {
   });
 
   useEffect(() => {
-    if (!folderNumber) {
+    if (!applicationNumber) {
       navigate('/access');
       return;
     }
     fetchExistingDocs();
-  }, [folderNumber, navigate]);
+  }, [applicationNumber, navigate]);
 
   const fetchExistingDocs = async () => {
     try {
       const { data } = await supabase
         .from('student_documents')
         .select('*')
-        .eq('folder_number', folderNumber);
+        .eq('application_number', applicationNumber);
         
       if (data) {
         const others: {id: string, name: string, url: string}[] = [];
@@ -182,7 +182,7 @@ export const DocumentUploadForm = () => {
       
       // Update form 3 status in basic details if we wanted to track it, but we can just mark form 3 complete in our app logic by checking if documents exist.
       
-      if (adminEditFolder) {
+      if (adminEditApp) {
         alert("Documents saved successfully!");
         navigate('/admin/dashboard');
       } else {
@@ -200,14 +200,14 @@ export const DocumentUploadForm = () => {
   return (
     <div className="flex flex-col max-w-4xl mx-auto py-8">
       <div className="mb-6">
-        <Button variant="ghost" onClick={() => navigate(adminEditFolder ? '/admin/dashboard' : '/dashboard')} className="text-text-secondary hover:text-white -ml-4">
-          <ArrowLeft className="w-4 h-4 mr-2" /> {adminEditFolder ? 'Back to Admin Dashboard' : 'Back to Dashboard'}
+        <Button variant="ghost" onClick={() => navigate(adminEditApp ? '/admin/dashboard' : '/dashboard')} className="text-text-secondary hover:text-white -ml-4">
+          <ArrowLeft className="w-4 h-4 mr-2" /> {adminEditApp ? 'Back to Admin Dashboard' : 'Back to Dashboard'}
         </Button>
       </div>
 
       <div className="mb-10 text-center">
         <h1 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent flex items-center justify-center gap-2">
-          {adminEditFolder && <span className="text-yellow-500 text-2xl font-bold">[ADMIN MODE]</span>} Document Uploads
+          {adminEditApp && <span className="text-yellow-500 text-2xl font-bold">[ADMIN MODE]</span>} Document Uploads
         </h1>
         <p className="text-text-secondary">
           Please upload your certificates and documents. Accepted formats: PDF, PNG, JPG (Max 5MB per file).

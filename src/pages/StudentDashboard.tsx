@@ -8,27 +8,27 @@ import { supabase } from '../supabase/client';
 
 export const StudentDashboard = () => {
   const navigate = useNavigate();
-  const [folderNumber, setFolderNumber] = useState<string | null>(null);
+  const [applicationNumber, setApplicationNumber] = useState<string | null>(null);
   const [form2Status, setForm2Status] = useState<'Not Started' | 'Pending' | 'Completed'>('Not Started');
   const [form3Status, setForm3Status] = useState<'Not Started' | 'Pending' | 'Completed'>('Not Started');
 
   useEffect(() => {
-    const fn = localStorage.getItem('student_folder_number');
+    const fn = localStorage.getItem('student_application_number');
     if (!fn) {
       navigate('/access');
       return;
     }
-    setFolderNumber(fn);
+    setApplicationNumber(fn);
 
     const checkStatus = async () => {
       const isConfigured = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
       if (!isConfigured) return; // In mock mode, we just leave them as Not Started for visual demo
 
       try {
-        const { data: fData } = await supabase.from('first_year_data').select('status').eq('folder_number', fn).single();
+        const { data: fData } = await supabase.from('first_year_data').select('status').eq('application_number', fn).single();
         if (fData) setForm2Status(fData.status === 'submitted' ? 'Completed' : 'Pending');
 
-        const { count } = await supabase.from('student_documents').select('*', { count: 'exact', head: true }).eq('folder_number', fn);
+        const { count } = await supabase.from('student_documents').select('*', { count: 'exact', head: true }).eq('application_number', fn);
         if (count && count >= 7) {
           // Assuming 7 mandatory docs
           setForm3Status('Completed');
@@ -42,7 +42,7 @@ export const StudentDashboard = () => {
     checkStatus();
   }, [navigate]);
 
-  if (!folderNumber) return null;
+  if (!applicationNumber) return null;
 
   return (
     <div className="flex flex-col max-w-6xl mx-auto py-8">
@@ -59,7 +59,7 @@ export const StudentDashboard = () => {
       >
         <h1 className="text-3xl font-bold mb-2">Student Dashboard</h1>
         <p className="text-text-secondary">
-          Welcome back! You are viewing the registration profile for Folder: <span className="text-white font-mono bg-white/10 px-2 py-1 rounded">{folderNumber}</span>
+          Welcome back! You are viewing the registration profile for Application Number: <span className="text-white font-mono bg-white/10 px-2 py-1 rounded">{applicationNumber}</span>
         </p>
       </motion.div>
 

@@ -14,6 +14,8 @@ export const AdminDashboard = () => {
   const [students, setStudents] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'submissions' | 'registered'>('submissions');
+  const [registeredStudents, setRegisteredStudents] = useState<any[]>([]);
   const [selectedFolderNumber, setSelectedFolderNumber] = useState<string | null>(null);
   const [printMode, setPrintMode] = useState(false);
 
@@ -29,8 +31,8 @@ export const AdminDashboard = () => {
     if (!isConfigured) {
       setTimeout(() => {
         setStudents([
-          { id: '1', folder_number: 'DDMM/CS/001', student_name: 'John Doe', email: 'john@example.com', programme: 'B.E Computer Science and Engineering', status: 'submitted', created_at: new Date().toISOString() },
-          { id: '2', folder_number: 'DDMM/IT/002', student_name: 'Jane Smith', email: 'jane@example.com', programme: 'B.Tech Information Technology', status: 'draft', created_at: new Date().toISOString() }
+          { id: '1', application_number: 'DDMM/CS/001', student_name: 'John Doe', email: 'john@example.com', programme: 'B.E Computer Science and Engineering', status: 'submitted', created_at: new Date().toISOString() },
+          { id: '2', application_number: 'DDMM/IT/002', student_name: 'Jane Smith', email: 'jane@example.com', programme: 'B.Tech Information Technology', status: 'draft', created_at: new Date().toISOString() }
         ]);
         setStats({ total: 2, completed: 1, pending: 1, today: 2 });
         setIsLoading(false);
@@ -40,6 +42,11 @@ export const AdminDashboard = () => {
 
     try {
       const { data: firstYearData } = await supabase.from('first_year_data').select('*');
+      const { data: profiles } = await supabase.from('student_profiles').select('*');
+
+      if (profiles) {
+        setRegisteredStudents(profiles);
+      }
 
       if (firstYearData) {
         setStudents(firstYearData);
@@ -66,8 +73,8 @@ export const AdminDashboard = () => {
     }
   };
 
-  const handleDelete = async (folderNumber: string) => {
-    if (!window.confirm(`Are you sure you want to permanently delete the registration for Folder No. ${folderNumber}? This action cannot be undone.`)) {
+  const handleDelete = async (applicationNumber: string) => {
+    if (!window.confirm(`Are you sure you want to permanently delete the registration for Folder No. ${applicationNumber}? This action cannot be undone.`)) {
       return;
     }
 
@@ -75,12 +82,12 @@ export const AdminDashboard = () => {
       const { error } = await supabase
         .from('first_year_data')
         .delete()
-        .eq('folder_number', folderNumber);
+        .eq('application_number', applicationNumber);
 
       if (error) {
         alert("Failed to delete record: " + error.message);
       } else {
-        setStudents(prev => prev.filter(s => s.folder_number !== folderNumber));
+        setStudents(prev => prev.filter(s => s.application_number !== applicationNumber));
         // Recalculate stats entirely to be safe
         fetchData();
         alert("Record deleted successfully.");
@@ -101,7 +108,7 @@ export const AdminDashboard = () => {
 
       return fydData.map(fyd => {
         return {
-          "Folder Number": fyd.folder_number,
+          "Folder Number": fyd.application_number,
           "Status": fyd.status,
           "Registration Date": new Date(fyd.created_at).toLocaleString(),
           "Email": fyd.email,
@@ -237,7 +244,12 @@ export const AdminDashboard = () => {
   const filteredStudents = students.filter(student => 
     student.student_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     student.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.folder_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    student.application_number?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredRegistered = registeredStudents.filter(student => 
+    student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    student.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     student.application_number?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -297,15 +309,31 @@ export const AdminDashboard = () => {
           <p className="text-sm text-text-secondary">Today's Registrations</p>
         </Card>
       </div>
+      <div className="flex space-x-2 mb-4">
+        <Button 
+          variant={activeTab === 'submissions' ? 'primary' : 'ghost'} 
+          onClick={() => setActiveTab('submissions')}
+          className={activeTab === 'submissions' ? '' : 'text-text-secondary hover:text-white'}
+        >
+          Form Submissions
+        </Button>
+        <Button 
+          variant={activeTab === 'registered' ? 'primary' : 'ghost'} 
+          onClick={() => setActiveTab('registered')}
+          className={activeTab === 'registered' ? '' : 'text-text-secondary hover:text-white'}
+        >
+          Registered Profiles
+        </Button>
+      </div>
 
       <Card className="flex-1 min-h-[500px]">
         <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
-          <h2 className="text-xl font-bold">Student Records</h2>
+          <h2 className="text-xl font-bold">{activeTab === 'submissions' ? 'Student Records' : 'Registered Students'}</h2>
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-3.5 w-4 h-4 text-text-secondary pointer-events-none" />
             <Input 
               label=""
-              placeholder="Search by name, email, folder..." 
+              placeholder="Search by name, email, app no..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 mb-0"
@@ -317,11 +345,13 @@ export const AdminDashboard = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-white/10">
-                <th className="p-4 font-medium text-text-secondary">Folder No.</th>
-                <th className="p-4 font-medium text-text-secondary">Student Name</th>
+                <th className="p-4 font-medium text-text-secondary">App No.</th>
+                <th className="p-4 font-medium text-text-secondary">Name</th>
                 <th className="p-4 font-medium text-text-secondary">Email</th>
-                <th className="p-4 font-medium text-text-secondary">Programme</th>
-                <th className="p-4 font-medium text-text-secondary">Status</th>
+                {activeTab === 'submissions' && <th className="p-4 font-medium text-text-secondary">Programme</th>}
+                {activeTab === 'registered' && <th className="p-4 font-medium text-text-secondary">Course</th>}
+                {activeTab === 'submissions' && <th className="p-4 font-medium text-text-secondary">Status</th>}
+                {activeTab === 'registered' && <th className="p-4 font-medium text-text-secondary">Mobile</th>}
                 <th className="p-4 font-medium text-text-secondary text-right">Actions</th>
               </tr>
             </thead>
@@ -330,14 +360,15 @@ export const AdminDashboard = () => {
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-text-secondary">Loading records...</td>
                 </tr>
-              ) : filteredStudents.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="p-8 text-center text-text-secondary">No records found.</td>
-                </tr>
-              ) : (
+              ) : activeTab === 'submissions' ? (
+                filteredStudents.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-text-secondary">No records found.</td>
+                  </tr>
+                ) : (
                 filteredStudents.map((student) => (
                   <tr key={student.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td className="p-4 font-medium">{student.folder_number || '-'}</td>
+                    <td className="p-4 font-medium">{student.application_number || '-'}</td>
                     <td className="p-4">{student.student_name || 'N/A'}</td>
                     <td className="p-4 text-text-secondary">{student.email}</td>
                     <td className="p-4">{student.programme || '-'}</td>
@@ -352,30 +383,56 @@ export const AdminDashboard = () => {
                       <Button 
                         variant="ghost" 
                         className="text-primary hover:text-white px-3 py-1 mr-2" 
-                        onClick={() => { setSelectedFolderNumber(student.folder_number); setPrintMode(false); }}
+                        onClick={() => { setSelectedFolderNumber(student.application_number); setPrintMode(false); }}
                       >
                         View Profile
                       </Button>
                       <Button 
                         className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 mr-2 h-8 text-sm" 
-                        onClick={() => { setSelectedFolderNumber(student.folder_number); setPrintMode(true); }}
+                        onClick={() => { setSelectedFolderNumber(student.application_number); setPrintMode(true); }}
                       >
                         Print
                       </Button>
                       <Button 
                         variant="ghost" 
                         className="text-yellow-500 hover:text-yellow-400 hover:bg-yellow-500/10 px-2 py-1 mr-2" 
-                        onClick={() => navigate(`/form/first-year-data?adminEditFolder=${encodeURIComponent(student.folder_number)}`)} 
+                        onClick={() => navigate(`/form/first-year-data?adminEditApp=${encodeURIComponent(student.application_number)}`)} 
                         title="Edit Record"
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" className="text-red-500 hover:text-red-400 hover:bg-red-500/10 px-2 py-1" onClick={() => handleDelete(student.folder_number)} title="Delete Record">
+                      <Button variant="ghost" className="text-red-500 hover:text-red-400 hover:bg-red-500/10 px-2 py-1" onClick={() => handleDelete(student.application_number)} title="Delete Record">
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </td>
                   </tr>
                 ))
+                )
+              ) : (
+                filteredRegistered.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-text-secondary">No registered profiles found.</td>
+                  </tr>
+                ) : (
+                  filteredRegistered.map((student) => (
+                    <tr key={student.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                      <td className="p-4 font-medium">{student.application_number || '-'}</td>
+                      <td className="p-4">{student.name || 'N/A'}</td>
+                      <td className="p-4 text-text-secondary">{student.email}</td>
+                      <td className="p-4">{student.course || '-'}</td>
+                      <td className="p-4">{student.mobile_number || '-'}</td>
+                      <td className="p-4 text-right whitespace-nowrap">
+                        <Button 
+                          variant="ghost" 
+                          className="text-primary hover:text-white px-3 py-1 mr-2" 
+                          onClick={() => { setSelectedFolderNumber(student.application_number); setPrintMode(false); }}
+                        >
+                          View Profile
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                )
               )}
             </tbody>
           </table>
@@ -384,7 +441,7 @@ export const AdminDashboard = () => {
 
       {selectedFolderNumber && (
         <StudentProfileModal 
-          folderNumber={selectedFolderNumber} 
+          applicationNumber={selectedFolderNumber} 
           onClose={() => { setSelectedFolderNumber(null); setPrintMode(false); }} 
           startInPrintMode={printMode}
         />

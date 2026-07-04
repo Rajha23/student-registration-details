@@ -19,9 +19,9 @@ const STEPS = ['Personal Details', 'Family Details', 'Community, Income & School
 export const FirstYearDataForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const adminEditFolder = searchParams.get('adminEditFolder');
+  const adminEditApp = searchParams.get('adminEditApp');
   
-  const [folderNumber, setFolderNumber] = useState<string | null>(null);
+  const [applicationNumber, setApplicationNumber] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -173,12 +173,12 @@ export const FirstYearDataForm = () => {
 
   // Load draft data on mount
   useEffect(() => {
-    const fn = adminEditFolder || localStorage.getItem('student_folder_number');
+    const fn = adminEditApp || localStorage.getItem('student_application_number');
     if (!fn) {
       navigate('/access');
       return;
     }
-    setFolderNumber(fn);
+    setApplicationNumber(fn);
 
     const loadDraft = async () => {
       const isConfigured = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -187,12 +187,12 @@ export const FirstYearDataForm = () => {
       const { data } = await supabase
         .from('first_year_data')
         .select('*')
-        .eq('folder_number', fn)
+        .eq('application_number', fn)
         .single();
         
       if (data) {
         Object.keys(data).forEach((key) => {
-          if (key !== 'id' && key !== 'folder_number' && key !== 'created_at' && key !== 'updated_at' && key !== 'status') {
+          if (key !== 'id' && key !== 'application_number' && key !== 'created_at' && key !== 'updated_at' && key !== 'status') {
              // @ts-ignore
              setValue(key, data[key] || '');
           }
@@ -200,7 +200,7 @@ export const FirstYearDataForm = () => {
       }
     };
     loadDraft();
-  }, [navigate, setValue, adminEditFolder]);
+  }, [navigate, setValue, adminEditApp]);
 
   const handleNext = async () => {
     let fieldsToValidate: any[] = [];
@@ -236,7 +236,7 @@ export const FirstYearDataForm = () => {
   };
 
   const handleSaveDraft = async (data: Partial<FirstYearDataFormData>) => {
-    if (!folderNumber) return;
+    if (!applicationNumber) return;
     setIsSaving(true);
     
     const isConfigured = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -254,8 +254,8 @@ export const FirstYearDataForm = () => {
         .upsert({
           status: 'draft',
           ...data,
-          folder_number: folderNumber
-        }, { onConflict: 'folder_number' });
+          application_number: applicationNumber
+        }, { onConflict: 'application_number' });
         
       if (error) throw error;
       alert("Draft saved successfully!");
@@ -267,14 +267,14 @@ export const FirstYearDataForm = () => {
   };
 
   const onSubmit = async (data: FirstYearDataFormData) => {
-    if (!folderNumber) return;
+    if (!applicationNumber) return;
     setIsSubmitting(true);
 
     const isConfigured = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
     if (!isConfigured) {
       setTimeout(() => {
-        if (adminEditFolder) {
-          navigate(`/form/documents?adminEditFolder=${encodeURIComponent(adminEditFolder)}`);
+        if (adminEditApp) {
+          navigate(`/form/documents?adminEditApp=${encodeURIComponent(adminEditApp)}`);
         } else {
           navigate('/form/documents');
         }
@@ -288,13 +288,13 @@ export const FirstYearDataForm = () => {
         .upsert({
           status: 'submitted',
           ...data,
-          folder_number: folderNumber
-        }, { onConflict: 'folder_number' });
+          application_number: applicationNumber
+        }, { onConflict: 'application_number' });
         
       if (error) throw error;
       
-      if (adminEditFolder) {
-        navigate(`/form/documents?adminEditFolder=${encodeURIComponent(adminEditFolder)}`);
+      if (adminEditApp) {
+        navigate(`/form/documents?adminEditApp=${encodeURIComponent(adminEditApp)}`);
       } else {
         navigate('/form/documents');
       }
@@ -320,15 +320,15 @@ export const FirstYearDataForm = () => {
   return (
     <div className="max-w-4xl mx-auto py-8 relative">
       <div className="mb-4">
-        <Button variant="ghost" onClick={() => navigate(adminEditFolder ? '/admin/dashboard' : '/dashboard')} className="text-text-secondary hover:text-white -ml-4">
-          <ArrowLeft className="w-4 h-4 mr-2" /> {adminEditFolder ? 'Back to Admin Dashboard' : 'Back to Dashboard'}
+        <Button variant="ghost" onClick={() => navigate(adminEditApp ? '/admin/dashboard' : '/dashboard')} className="text-text-secondary hover:text-white -ml-4">
+          <ArrowLeft className="w-4 h-4 mr-2" /> {adminEditApp ? 'Back to Admin Dashboard' : 'Back to Dashboard'}
         </Button>
       </div>
 
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-            {adminEditFolder && <span className="text-yellow-500 text-2xl font-bold">[ADMIN MODE]</span>} First Year Data 2026-27
+            {adminEditApp && <span className="text-yellow-500 text-2xl font-bold">[ADMIN MODE]</span>} First Year Data 2026-27
           </h1>
           <p className="text-text-secondary">Please provide your family, community, and income details.</p>
         </div>
@@ -351,8 +351,6 @@ export const FirstYearDataForm = () => {
             >
               {currentStep === 0 && (
                 <div className="grid md:grid-cols-2 gap-6">
-                  <Input label="Folder Number" value={folderNumber || ''} readOnly className="md:col-span-2 bg-white/5 cursor-not-allowed text-text-secondary" />
-                  
                   <Input label="Primary Email Address" type="email" {...register('email')} error={errors.email?.message} required className="md:col-span-2" />
                   <Input label="Student Name" {...register('student_name')} error={errors.student_name?.message} required className="md:col-span-2" />
                   
@@ -365,7 +363,7 @@ export const FirstYearDataForm = () => {
                   ]} />
                   
                   <Select label="Admission Category" {...register('admission_category')} error={errors.admission_category?.message} required options={[{ value: 'Management Quota', label: 'Management Quota' }, { value: 'Government Quota (Counseling)', label: 'Government Quota (Counseling)' }]} />
-                  <Input label="Application/Allotment Number" {...register('application_number')} error={errors.application_number?.message} required />
+                  <Input label="Application Number" {...register('application_number')} error={errors.application_number?.message} required readOnly className="bg-white/5 cursor-not-allowed text-text-secondary" />
                   
                   <Input label="Mobile Number" type="tel" maxLength={10} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('mobile_number')} error={errors.mobile_number?.message} required />
                   <Input label="Alternative Number" type="tel" maxLength={10} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('alternative_number')} error={errors.alternative_number?.message} />

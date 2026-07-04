@@ -6,12 +6,12 @@ import { supabase } from '../../supabase/client';
 import { PrintableReport } from './PrintableReport';
 
 interface StudentProfileModalProps {
-  folderNumber: string;
+  applicationNumber: string;
   onClose: () => void;
   startInPrintMode?: boolean;
 }
 
-export const StudentProfileModal = ({ folderNumber, onClose, startInPrintMode }: StudentProfileModalProps) => {
+export const StudentProfileModal = ({ applicationNumber, onClose, startInPrintMode }: StudentProfileModalProps) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [firstYearData, setFirstYearData] = useState<any>(null);
@@ -28,7 +28,7 @@ export const StudentProfileModal = ({ folderNumber, onClose, startInPrintMode }:
         // Mock Data
         setTimeout(() => {
           setFirstYearData({
-            folder_number: folderNumber,
+            application_number: applicationNumber,
             student_name: 'John Doe Mock',
             email: 'john@example.com',
             mobile_number: '9876543210',
@@ -50,8 +50,8 @@ export const StudentProfileModal = ({ folderNumber, onClose, startInPrintMode }:
       }
 
       try {
-        const { data: fData } = await supabase.from('first_year_data').select('*').eq('folder_number', folderNumber).single();
-        const { data: dData } = await supabase.from('student_documents').select('*').eq('folder_number', folderNumber);
+        const { data: fData } = await supabase.from('first_year_data').select('*').eq('application_number', applicationNumber).single();
+        const { data: dData } = await supabase.from('student_documents').select('*').eq('application_number', applicationNumber);
         
         setFirstYearData(fData);
         setDocumentsData(dData || []);
@@ -63,7 +63,7 @@ export const StudentProfileModal = ({ folderNumber, onClose, startInPrintMode }:
     };
 
     fetchProfile();
-  }, [folderNumber]);
+  }, [applicationNumber]);
 
   const handleShowReport = () => {
     setIsPrinting(true);
@@ -134,13 +134,13 @@ export const StudentProfileModal = ({ folderNumber, onClose, startInPrintMode }:
           <div className="flex items-center justify-between p-6 border-b border-white/10 bg-white/5">
             <div>
               <h2 className="text-2xl font-bold">Student Profile</h2>
-              <p className="text-text-secondary">Folder: <span className="font-mono text-white">{folderNumber}</span></p>
+              <p className="text-text-secondary">Folder: <span className="font-mono text-white">{applicationNumber}</span></p>
             </div>
             <div className="flex items-center gap-3">
               {!isLoading && firstYearData && (
                 <>
                   <button
-                    onClick={() => navigate(`/form/first-year-data?adminEditFolder=${encodeURIComponent(folderNumber)}`)}
+                    onClick={() => navigate(`/form/first-year-data?adminEditApp=${encodeURIComponent(applicationNumber)}`)}
                     className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm font-medium"
                   >
                     <Edit className="w-4 h-4" />
@@ -186,7 +186,6 @@ export const StudentProfileModal = ({ folderNumber, onClose, startInPrintMode }:
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-2">
-                    <Field label="Folder Number" value={firstYearData.folder_number} />
                     <Field label="Application Number" value={firstYearData.application_number} />
                     <Field label="Student Name" value={firstYearData.student_name} />
                     <Field label="Primary Email" value={firstYearData.email} />
