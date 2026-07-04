@@ -219,8 +219,8 @@ export const FirstYearDataForm = () => {
       }
     } else if (currentStep === 2) {
       fieldsToValidate = ['religion', 'community', 'caste_name', 'father_income', 'mother_income', 'guardian_income', 'first_graduate', 'emis_number', 'date_of_document_submission', 
-      'tenth_district', 'tenth_block', 'tenth_school', 'tenth_total_marks', 'tenth_lang_mark', 'tenth_eng_mark', 'tenth_math_mark', 'tenth_sci_mark', 'tenth_soc_mark',
-      'twelfth_district', 'twelfth_block', 'twelfth_school', 'twelfth_total_marks', 'twelfth_lang_mark', 'twelfth_eng_mark', 'twelfth_sub1_name', 'twelfth_sub1_mark', 'twelfth_sub2_name', 'twelfth_sub2_mark', 'twelfth_sub3_name', 'twelfth_sub3_mark', 'twelfth_sub4_name', 'twelfth_sub4_mark',
+      'tenth_board', 'tenth_medium', 'tenth_district', 'tenth_block', 'tenth_school', 'tenth_total_marks', 'tenth_lang_mark', 'tenth_eng_mark', 'tenth_math_mark', 'tenth_sci_mark', 'tenth_soc_mark',
+      'twelfth_board', 'twelfth_medium', 'twelfth_district', 'twelfth_block', 'twelfth_school', 'twelfth_total_marks', 'twelfth_lang_mark', 'twelfth_eng_mark', 'twelfth_sub1_name', 'twelfth_sub1_mark', 'twelfth_sub2_name', 'twelfth_sub2_mark', 'twelfth_sub3_name', 'twelfth_sub3_mark', 'twelfth_sub4_name', 'twelfth_sub4_mark',
       ...(community === 'Other' ? ['community_other'] : []), ...(community !== 'OC' ? ['community_certificate_number'] : [])];
     }
     
@@ -540,6 +540,8 @@ export const FirstYearDataForm = () => {
                   <div className="md:col-span-2 border-t border-white/10 pt-6 mt-2">
                     <h3 className="text-lg font-medium text-white mb-4">10th Standard Details</h3>
                     <div className="grid md:grid-cols-2 gap-6">
+                      <Select label="Board of Education" {...register('tenth_board')} error={errors.tenth_board?.message} required options={[{value: 'State Board/Matric', label: 'State Board/Matric'}, {value: 'CBSE', label: 'CBSE'}, {value: 'ICSE', label: 'ICSE'}]} />
+                      <Select label="Medium of Instruction" {...register('tenth_medium')} error={errors.tenth_medium?.message} required options={[{value: 'English', label: 'English'}, {value: 'Tamil', label: 'Tamil'}]} />
                       <Select label="District" {...register('tenth_district')} error={errors.tenth_district?.message} required options={tenthDistrictOptions} />
                       <Select label="Block" {...register('tenth_block')} error={errors.tenth_block?.message} required options={tenthBlockOptions} disabled={!tenthDistrict} />
                       <div className="md:col-span-2">
@@ -564,6 +566,8 @@ export const FirstYearDataForm = () => {
                     <h3 className="text-lg font-medium text-white mb-4">12th Standard Details</h3>
                     <div className="grid md:grid-cols-2 gap-6">
                       <Input label="EMIS Number" {...register('emis_number')} error={errors.emis_number?.message} required className="md:col-span-2" />
+                      <Select label="Board of Education" {...register('twelfth_board')} error={errors.twelfth_board?.message} required options={[{value: 'State Board/Matric', label: 'State Board/Matric'}, {value: 'CBSE', label: 'CBSE'}, {value: 'ICSE', label: 'ICSE'}]} />
+                      <Select label="Medium of Instruction" {...register('twelfth_medium')} error={errors.twelfth_medium?.message} required options={[{value: 'English', label: 'English'}, {value: 'Tamil', label: 'Tamil'}]} />
                       <Select label="District" {...register('twelfth_district')} error={errors.twelfth_district?.message} required options={twelfthDistrictOptions} />
                       <Select label="Block" {...register('twelfth_block')} error={errors.twelfth_block?.message} required options={twelfthBlockOptions} disabled={!twelfthDistrict} />
                       <div className="md:col-span-2">

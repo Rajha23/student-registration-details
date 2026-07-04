@@ -152,9 +152,11 @@ export const PrintableReport = ({ basicData, firstYearData, documentsData }: Pri
             <div className="border border-gray-300 rounded overflow-hidden">
               <div className="bg-gray-100 px-4 py-2 font-bold border-b border-gray-300">10th Standard Details</div>
               <div className="p-4 grid grid-cols-3 gap-4 text-sm">
+                <div><strong className="text-gray-700">Board:</strong> {firstYearData?.tenth_board || '-'}</div>
+                <div><strong className="text-gray-700">Medium:</strong> {firstYearData?.tenth_medium || '-'}</div>
                 <div><strong className="text-gray-700">District:</strong> {firstYearData?.tenth_district || '-'}</div>
                 <div><strong className="text-gray-700">Block:</strong> {firstYearData?.tenth_block || '-'}</div>
-                <div className="col-span-3"><strong className="text-gray-700">School:</strong> {firstYearData?.tenth_school || '-'}</div>
+                <div className="col-span-2"><strong className="text-gray-700">School:</strong> {firstYearData?.tenth_school || '-'}</div>
                 
                 <div className="col-span-3 mt-2">
                   <strong className="text-gray-700 block mb-2 border-b border-gray-300 pb-1">10th Marks (Out of 100)</strong>
@@ -174,6 +176,8 @@ export const PrintableReport = ({ basicData, firstYearData, documentsData }: Pri
               <div className="bg-gray-100 px-4 py-2 font-bold border-b border-gray-300">12th Standard Details</div>
               <div className="p-4 grid grid-cols-3 gap-4 text-sm">
                 <div><strong className="text-gray-700">EMIS Number:</strong> {firstYearData?.emis_number || '-'}</div>
+                <div><strong className="text-gray-700">Board:</strong> {firstYearData?.twelfth_board || '-'}</div>
+                <div><strong className="text-gray-700">Medium:</strong> {firstYearData?.twelfth_medium || '-'}</div>
                 <div><strong className="text-gray-700">District:</strong> {firstYearData?.twelfth_district || '-'}</div>
                 <div><strong className="text-gray-700">Block:</strong> {firstYearData?.twelfth_block || '-'}</div>
                 <div className="col-span-3"><strong className="text-gray-700">School:</strong> {firstYearData?.twelfth_school || '-'}</div>

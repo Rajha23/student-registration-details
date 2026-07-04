@@ -287,6 +287,8 @@ export const StudentProfileModal = ({ folderNumber, onClose, startInPrintMode }:
                   <div className="mt-8">
                     <h3 className="text-lg font-medium text-white border-b border-white/10 pb-2 mb-4">10th Standard Details</h3>
                     <div className="grid md:grid-cols-2 gap-4 gap-y-6">
+                      <Field label="Board of Education" value={firstYearData.tenth_board} />
+                      <Field label="Medium of Instruction" value={firstYearData.tenth_medium} />
                       <Field label="District" value={firstYearData.tenth_district} />
                       <Field label="Block" value={firstYearData.tenth_block} />
                       <div className="col-span-2">
@@ -309,6 +311,8 @@ export const StudentProfileModal = ({ folderNumber, onClose, startInPrintMode }:
                   <div className="mt-8">
                     <h3 className="text-lg font-medium text-white border-b border-white/10 pb-2 mb-4">12th Standard Details</h3>
                     <div className="grid md:grid-cols-2 gap-4 gap-y-6">
+                      <Field label="Board of Education" value={firstYearData.twelfth_board} />
+                      <Field label="Medium of Instruction" value={firstYearData.twelfth_medium} />
                       <Field label="District" value={firstYearData.twelfth_district} />
                       <Field label="Block" value={firstYearData.twelfth_block} />
                       <div className="col-span-2">

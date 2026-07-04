@@ -151,6 +151,8 @@ export const AdminDashboard = () => {
           
           "EMIS Number": fyd.emis_number,
 
+          "10th Board": fyd.tenth_board,
+          "10th Medium": fyd.tenth_medium,
           "10th District": fyd.tenth_district,
           "10th Block": fyd.tenth_block,
           "10th School": fyd.tenth_school,
@@ -161,6 +163,8 @@ export const AdminDashboard = () => {
           "10th Sci Mark": fyd.tenth_sci_mark,
           "10th Soc Mark": fyd.tenth_soc_mark,
 
+          "12th Board": fyd.twelfth_board,
+          "12th Medium": fyd.twelfth_medium,
           "12th District": fyd.twelfth_district,
           "12th Block": fyd.twelfth_block,
           "12th School": fyd.twelfth_school,
