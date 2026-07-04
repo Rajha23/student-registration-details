@@ -53,7 +53,17 @@ export const FirstYearDataForm = () => {
   const prevBlock = useRef<string | undefined>(block);
   const prevResidence = useRef<string | undefined>(residenceType);
   const prevTransport = useRef<string | undefined>(transportMode);
+  const prevCommunity = useRef<string | undefined>(community);
   
+  useEffect(() => {
+    if (prevCommunity.current !== undefined && prevCommunity.current !== community) {
+      if (community === 'OC') {
+        setValue('community_certificate_number', '', { shouldValidate: false });
+      }
+    }
+    prevCommunity.current = community;
+  }, [community, setValue]);
+
   useEffect(() => {
     // Only clear if the previous value was set (not initial mount/draft load) and it actually changed
     if (prevDistrict.current !== undefined && prevDistrict.current !== district) {
@@ -157,7 +167,7 @@ export const FirstYearDataForm = () => {
         }
       }
     } else if (currentStep === 2) {
-      fieldsToValidate = ['religion', 'community', 'caste_name', 'community_certificate_number', 'father_income', 'mother_income', 'guardian_income', 'first_graduate', 'emis_number', 'district', 'block', 'school', 'date_of_document_submission', ...(community === 'Other' ? ['community_other'] : [])];
+      fieldsToValidate = ['religion', 'community', 'caste_name', 'father_income', 'mother_income', 'guardian_income', 'first_graduate', 'emis_number', 'district', 'block', 'school', 'date_of_document_submission', ...(community === 'Other' ? ['community_other'] : []), ...(community !== 'OC' ? ['community_certificate_number'] : [])];
     }
     
     const isStepValid = await trigger(fieldsToValidate);
@@ -411,7 +421,10 @@ export const FirstYearDataForm = () => {
                   )}
 
                   <Input label="Caste Name" {...register('caste_name')} error={errors.caste_name?.message} required />
-                  <Input label="Community Certificate Number" placeholder="TN-XXXX" {...register('community_certificate_number')} error={errors.community_certificate_number?.message} required />
+                  
+                  {community !== 'OC' && (
+                    <Input label="Community Certificate Number" placeholder="TN-XXXX" {...register('community_certificate_number')} error={errors.community_certificate_number?.message} required />
+                  )}
                   
                   <div className="md:col-span-2 grid md:grid-cols-3 gap-6">
                     <Input label="Father's Income" {...register('father_income')} error={errors.father_income?.message} required />

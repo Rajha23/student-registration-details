@@ -44,7 +44,7 @@ export const firstYearDataSchema = z.object({
   community: z.string().min(1, "Community is required"),
   community_other: z.string().optional(),
   caste_name: z.string().min(1, "Caste Name is required"),
-  community_certificate_number: z.string().startsWith("TN-", "Must start with TN-"),
+  community_certificate_number: z.string().refine(val => !val || val.startsWith("TN-"), "Must start with TN-").optional(),
   father_income: z.string().min(1, "Father Income is required"),
   mother_income: z.string().min(1, "Mother Income is required"),
   guardian_income: z.string().optional(),
@@ -78,6 +78,14 @@ export const firstYearDataSchema = z.object({
       code: z.ZodIssueCode.custom,
       message: "Please enter the name of the PG or room you are staying in",
       path: ["outside_stay_details"],
+    });
+  }
+  
+  if (data.community !== 'OC' && !data.community_certificate_number) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Community Certificate Number is required",
+      path: ["community_certificate_number"],
     });
   }
 });

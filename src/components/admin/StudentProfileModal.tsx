@@ -194,15 +194,19 @@ export const StudentProfileModal = ({ folderNumber, onClose, startInPrintMode }:
                       <Field label="Outside Stay Details" value={firstYearData.outside_stay_details} />
                     )}
                     <Field label="Date of Birth" value={firstYearData.dob} />
-                    <Field label="Gender" value={firstYearData.gender === 'Other' ? firstYearData.gender_other : firstYearData.gender} />
-                    <Field label="Aadhaar Number" value={firstYearData.aadhaar_number} />
-                    <Field label="Field of Interest" value={firstYearData.field_of_interest} />
                     <Field label="Community" value={firstYearData.community === 'Other' ? firstYearData.community_other : firstYearData.community} />
                     <Field label="Admission Category" value={firstYearData.admission_category} />
                     <Field label="Programme" value={firstYearData.programme} />
                     <Field label="Course" value={firstYearData.course} />
-                    <Field label="Father/Guardian Name" value={firstYearData.father_name} />
-                    <Field label="Father Mobile" value={firstYearData.father_mobile} />
+                    <Field label="Application/Allotment No." value={firstYearData.application_number} />
+                    
+                    <h3 className="col-span-2 text-lg font-medium text-white border-b border-white/10 pb-2 mt-4">Family & Income Details</h3>
+                    <Field label="Religion" value={firstYearData.religion} />
+                    <Field label="Caste Name" value={firstYearData.caste_name} />
+                    {firstYearData.community !== 'OC' && (
+                      <Field label="Community Certificate No." value={firstYearData.community_certificate_number} />
+                    )}
+                    <Field label="Father's Income" value={firstYearData.father_income} />
                     <Field label="Date of Document Submission" value={firstYearData.date_of_document_submission} />
                   </div>
                 </div>
@@ -239,7 +243,9 @@ export const StudentProfileModal = ({ folderNumber, onClose, startInPrintMode }:
                     )}
                     <Field label="Religion" value={firstYearData.religion} />
                     <Field label="Caste Name" value={firstYearData.caste_name} />
-                    <Field label="Community Certificate No." value={firstYearData.community_certificate_number} />
+                    {firstYearData.community !== 'OC' && (
+                      <Field label="Community Certificate No." value={firstYearData.community_certificate_number} />
+                    )}
                     <Field label="Father's Income" value={firstYearData.father_income} />
                     <Field label="Mother's Income" value={firstYearData.mother_income} />
                     <Field label="Guardian's Income" value={firstYearData.guardian_income} />

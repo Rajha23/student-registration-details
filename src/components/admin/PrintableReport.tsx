@@ -112,7 +112,9 @@ export const PrintableReport = ({ basicData, firstYearData, documentsData }: Pri
 
           <div className="mt-4"><strong className="text-gray-700">Religion:</strong> {firstYearData?.religion || '-'}</div>
           <div><strong className="text-gray-700">Caste:</strong> {firstYearData?.caste_name || '-'}</div>
-          <div><strong className="text-gray-700">Community Cert No:</strong> {firstYearData?.community_certificate_number || '-'}</div>
+          {firstYearData?.community !== 'OC' && (
+            <div><strong className="text-gray-700">Community Cert No:</strong> {firstYearData?.community_certificate_number || '-'}</div>
+          )}
           
           <div><strong className="text-gray-700">Father Income:</strong> {firstYearData?.father_income || '-'}</div>
           <div><strong className="text-gray-700">Mother Income:</strong> {firstYearData?.mother_income || '-'}</div>
