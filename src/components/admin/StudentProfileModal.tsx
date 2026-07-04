@@ -234,7 +234,7 @@ export const StudentProfileModal = ({ applicationNumber, onClose, startInPrintMo
                     <Field label="Date of Birth" value={firstYearData.dob} />
                     <Field label="Community" value={firstYearData.community === 'Other' ? firstYearData.community_other : firstYearData.community} />
                     <Field label="Admission Category" value={firstYearData.admission_category} />
-                    <Field label="Programme" value={firstYearData.programme} />
+                    <Field label="Degree" value={firstYearData.programme} />
                     <Field label="Course" value={firstYearData.course} />
                     <Field label="Application/Allotment No." value={firstYearData.application_number} />
                     

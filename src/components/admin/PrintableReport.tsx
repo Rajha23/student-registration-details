@@ -101,7 +101,7 @@ export const PrintableReport = ({ basicData, firstYearData, documentsData }: Pri
             <div className="col-span-2"><strong className="text-gray-700">Outside Stay Details:</strong> {firstYearData?.outside_stay_details || '-'}</div>
           )}
           
-          <div><strong className="text-gray-700">Programme:</strong> {basicData?.programme}</div>
+          <div><strong className="text-gray-700">Degree:</strong> {basicData?.programme}</div>
           <div><strong className="text-gray-700">Course:</strong> {basicData?.course}</div>
           <div><strong className="text-gray-700">Admission Category:</strong> {basicData?.admission_category}</div>
           <div><strong className="text-gray-700">Community:</strong> {basicData?.community}</div>

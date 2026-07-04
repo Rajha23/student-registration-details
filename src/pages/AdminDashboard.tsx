@@ -113,7 +113,7 @@ export const AdminDashboard = () => {
           "Registration Date": new Date(fyd.created_at).toLocaleString(),
           "Email": fyd.email,
           "Student Name": fyd.student_name,
-          "Programme": fyd.programme,
+          "Degree": fyd.programme,
           "Course": fyd.course,
           "Admission Category": fyd.admission_category,
           "Application Number": fyd.application_number,
@@ -348,7 +348,7 @@ export const AdminDashboard = () => {
                 <th className="p-4 font-medium text-text-secondary">App No.</th>
                 <th className="p-4 font-medium text-text-secondary">Name</th>
                 <th className="p-4 font-medium text-text-secondary">Email</th>
-                {activeTab === 'submissions' && <th className="p-4 font-medium text-text-secondary">Programme</th>}
+                {activeTab === 'submissions' && <th className="p-4 font-medium text-text-secondary">Degree</th>}
                 {activeTab === 'registered' && <th className="p-4 font-medium text-text-secondary">Course</th>}
                 {activeTab === 'submissions' && <th className="p-4 font-medium text-text-secondary">Status</th>}
                 {activeTab === 'registered' && <th className="p-4 font-medium text-text-secondary">Mobile</th>}
