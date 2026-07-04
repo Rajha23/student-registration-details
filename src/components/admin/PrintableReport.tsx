@@ -202,6 +202,8 @@ export const PrintableReport = ({ basicData, firstYearData, documentsData }: Pri
           
           <div><strong className="text-gray-700">First Graduate:</strong> {firstYearData?.first_graduate || '-'}</div>
           <div><strong className="text-gray-700">First Grad Cert No:</strong> {firstYearData?.first_graduate_certificate_number || '-'}</div>
+          <div><strong className="text-gray-700">PMSS Scholarship:</strong> {firstYearData?.apply_pmss_scholarship || '-'}</div>
+          <div><strong className="text-gray-700">BC/MBC Scholarship:</strong> {firstYearData?.apply_bc_mbc_scholarship || '-'}</div>
           
           <div><strong className="text-gray-700">Blood Group:</strong> {firstYearData?.blood_group || '-'}</div>
           <div><strong className="text-gray-700">Mother Tongue:</strong> {firstYearData?.mother_tongue || '-'}</div>

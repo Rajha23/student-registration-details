@@ -148,6 +148,8 @@ export const AdminDashboard = () => {
           "Income Certificate No.": fyd.income_certificate_number,
           "First Graduate": fyd.first_graduate,
           "FG Certificate Number": fyd.first_graduate_certificate_number,
+          "PMSS Scholarship": fyd.apply_pmss_scholarship,
+          "BC/MBC Scholarship": fyd.apply_bc_mbc_scholarship,
           
           "EMIS Number": fyd.emis_number,
 

@@ -66,9 +66,14 @@ export const firstYearDataSchema = z.object({
   father_income: z.string().min(1, "Father Income is required"),
   mother_income: z.string().min(1, "Mother Income is required"),
   guardian_income: z.string().optional(),
-  income_certificate_number: z.string().refine(val => !val || val.startsWith("TN-"), "Must start with TN-").optional(),
-  first_graduate: z.string().min(1, "Please select Yes or No"),
+  income_certificate_number: z.string().optional(),
+  
+  // Scholarships
+  first_graduate: z.string().min(1, "First Graduate is required"),
   first_graduate_certificate_number: z.string().refine(val => !val || val.startsWith("TN-"), "Must start with TN-").optional(),
+  apply_pmss_scholarship: z.string().min(1, "Required"),
+  apply_bc_mbc_scholarship: z.string().min(1, "Required"),
+  
   emis_number: z.string().min(1, "EMIS Number is required"),
   
   district: z.string().optional(),

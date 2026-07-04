@@ -218,7 +218,7 @@ export const FirstYearDataForm = () => {
         }
       }
     } else if (currentStep === 2) {
-      fieldsToValidate = ['religion', 'community', 'caste_name', 'father_income', 'mother_income', 'guardian_income', 'first_graduate', 'emis_number', 'date_of_document_submission', 
+      fieldsToValidate = ['religion', 'community', 'caste_name', 'father_income', 'mother_income', 'guardian_income', 'first_graduate', 'apply_pmss_scholarship', 'apply_bc_mbc_scholarship', 'emis_number', 'date_of_document_submission', 
       'tenth_board', 'tenth_medium', 'tenth_district', 'tenth_block', 'tenth_school', 'tenth_total_marks', 'tenth_lang_mark', 'tenth_eng_mark', 'tenth_math_mark', 'tenth_sci_mark', 'tenth_soc_mark',
       'twelfth_board', 'twelfth_medium', 'twelfth_district', 'twelfth_block', 'twelfth_school', 'twelfth_total_marks', 'twelfth_lang_mark', 'twelfth_eng_mark', 'twelfth_sub1_name', 'twelfth_sub1_mark', 'twelfth_sub2_name', 'twelfth_sub2_mark', 'twelfth_sub3_name', 'twelfth_sub3_mark', 'twelfth_sub4_name', 'twelfth_sub4_mark',
       ...(community === 'Other' ? ['community_other'] : []), ...(community !== 'OC' ? ['community_certificate_number'] : [])];
@@ -532,11 +532,6 @@ export const FirstYearDataForm = () => {
                   
                   <Input label="Income Certificate Number (Optional)" {...register('income_certificate_number')} error={errors.income_certificate_number?.message} className="md:col-span-2" />
                   
-                  <Select label="First Graduate" {...register('first_graduate')} error={errors.first_graduate?.message} required options={[{ value: 'Yes', label: 'Yes' }, { value: 'No', label: 'No' }]} />
-                  {firstGraduate === 'Yes' && (
-                    <Input label="First Graduate Certificate Number" {...register('first_graduate_certificate_number')} error={errors.first_graduate_certificate_number?.message} required />
-                  )}
-                  
                   <div className="md:col-span-2 border-t border-white/10 pt-6 mt-2">
                     <h3 className="text-lg font-medium text-white mb-4">10th Standard Details</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -601,6 +596,24 @@ export const FirstYearDataForm = () => {
                             <Input label="Subject 4 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub4_mark')} error={errors.twelfth_sub4_mark?.message} required />
                           </div>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-2 border-t border-white/10 pt-6 mt-2">
+                    <h3 className="text-lg font-medium text-white mb-4">Scholarship Details</h3>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <Select label="1. Applying for first graduate?" {...register('first_graduate')} error={errors.first_graduate?.message} required options={[{ value: 'Yes', label: 'Yes' }, { value: 'No', label: 'No' }]} />
+                      {firstGraduate === 'Yes' && (
+                        <Input label="First Graduate Certificate Number" {...register('first_graduate_certificate_number')} error={errors.first_graduate_certificate_number?.message} required />
+                      )}
+                      
+                      <div className="md:col-span-2 space-y-4">
+                        <Select label="2. Applying for PMSS (Govt SC/ST Scholarship)?" {...register('apply_pmss_scholarship')} error={errors.apply_pmss_scholarship?.message} required options={[{ value: 'Yes', label: 'Yes' }, { value: 'No', label: 'No' }]} />
+                        <Select label="3. Applying for BC/MBC Scholarship?" {...register('apply_bc_mbc_scholarship')} error={errors.apply_bc_mbc_scholarship?.message} required options={[{ value: 'Yes', label: 'Yes' }, { value: 'No', label: 'No' }]} />
+                        <p className="text-sm text-purple-300 bg-purple-500/10 p-3 rounded-lg border border-purple-500/20">
+                          Note: Students whose annual parental income from all sources is less than Rs. 2,50,000 shall be eligible for the scholarship.
+                        </p>
                       </div>
                     </div>
                   </div>

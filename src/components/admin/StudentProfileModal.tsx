@@ -280,6 +280,8 @@ export const StudentProfileModal = ({ folderNumber, onClose, startInPrintMode }:
                     <Field label="Income Certificate No." value={firstYearData.income_certificate_number} />
                     <Field label="First Graduate" value={firstYearData.first_graduate} />
                     <Field label="First Graduate Cert. No." value={firstYearData.first_graduate_certificate_number} />
+                    <Field label="PMSS Scholarship" value={firstYearData.apply_pmss_scholarship} />
+                    <Field label="BC/MBC Scholarship" value={firstYearData.apply_bc_mbc_scholarship} />
                     <Field label="EMIS Number" value={firstYearData.emis_number} />
                     <Field label="Document Submission Date" value={firstYearData.date_of_document_submission} />
                   </div>
