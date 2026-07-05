@@ -12,12 +12,13 @@ interface StudentProfileModalProps {
   viewMode?: 'registered' | 'full';
 }
 
-export const StudentProfileModal = ({ applicationNumber, onClose, startInPrintMode = false, viewMode = 'full' }: StudentProfileModalProps) => {
+export const StudentProfileModal = ({ applicationNumber, onClose, startInPrintMode = false, viewMode: initialViewMode = 'full' }: StudentProfileModalProps) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [firstYearData, setFirstYearData] = useState<any>(null);
   const [documentsData, setDocumentsData] = useState<any[]>([]);
-  const [isPrinting, setIsPrinting] = useState(!!startInPrintMode);
+  const [isPrinting, setIsPrinting] = useState(startInPrintMode);
+  const [viewMode, setViewMode] = useState(initialViewMode);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -155,6 +156,14 @@ export const StudentProfileModal = ({ applicationNumber, onClose, startInPrintMo
               <p className="text-text-secondary">Application Number: <span className="font-mono text-white">{applicationNumber}</span></p>
             </div>
             <div className="flex items-center gap-3">
+              {!isLoading && firstYearData && viewMode === 'registered' && (
+                <button
+                  onClick={() => setViewMode('full')}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+                >
+                  View Form
+                </button>
+              )}
               {!isLoading && firstYearData && viewMode === 'full' && (
                 <>
                   <button
