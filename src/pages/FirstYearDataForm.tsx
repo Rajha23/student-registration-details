@@ -139,20 +139,22 @@ export const FirstYearDataForm = () => {
   }, [twelfthBlock, setValue]);
 
   // Auto-calculate 10th Total Marks
+  const tenthMarksJson = JSON.stringify(tenthMarks);
   useEffect(() => {
     if (tenthMarks.some(m => m !== undefined && m !== '')) {
       const total = tenthMarks.reduce((sum, mark) => sum + (parseInt(mark as string) || 0), 0);
       setValue('tenth_total_marks', total.toString(), { shouldValidate: true });
     }
-  }, [tenthMarks, setValue]);
+  }, [tenthMarksJson, setValue]);
 
   // Auto-calculate 12th Total Marks
+  const twelfthMarksJson = JSON.stringify(twelfthMarks);
   useEffect(() => {
     if (twelfthMarks.some(m => m !== undefined && m !== '')) {
       const total = twelfthMarks.reduce((sum, mark) => sum + (parseInt(mark as string) || 0), 0);
       setValue('twelfth_total_marks', total.toString(), { shouldValidate: true });
     }
-  }, [twelfthMarks, setValue]);
+  }, [twelfthMarksJson, setValue]);
 
   useEffect(() => {
     if (prevResidence.current !== undefined && prevResidence.current !== residenceType) {
