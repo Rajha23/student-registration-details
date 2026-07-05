@@ -75,21 +75,20 @@ export const AdminDashboard = () => {
   };
 
   const handleDelete = async (applicationNumber: string) => {
-    if (!window.confirm(`Are you sure you want to permanently delete the registration for Folder No. ${applicationNumber}? This action cannot be undone.`)) {
+    if (!window.confirm(`Are you sure you want to permanently delete the registration for Application No. ${applicationNumber}? This action cannot be undone.`)) {
       return;
     }
 
     try {
-      const { error } = await supabase
-        .from('first_year_data')
-        .delete()
-        .eq('application_number', applicationNumber);
+      await supabase.from('student_documents').delete().eq('application_number', applicationNumber);
+      await supabase.from('first_year_data').delete().eq('application_number', applicationNumber);
+      const { error } = await supabase.from('student_profiles').delete().eq('application_number', applicationNumber);
 
       if (error) {
         alert("Failed to delete record: " + error.message);
       } else {
         setStudents(prev => prev.filter(s => s.application_number !== applicationNumber));
-        // Recalculate stats entirely to be safe
+        setRegisteredStudents(prev => prev.filter(s => s.application_number !== applicationNumber));
         fetchData();
         alert("Record deleted successfully.");
       }
@@ -429,6 +428,17 @@ export const AdminDashboard = () => {
                           onClick={() => { setSelectedFolderNumber(student.application_number); setModalViewMode('registered'); setPrintMode(false); }}
                         >
                           View Profile
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          className="text-yellow-500 hover:text-yellow-400 hover:bg-yellow-500/10 px-2 py-1 mr-2" 
+                          onClick={() => navigate(`/form/first-year-data?adminEditApp=${encodeURIComponent(student.application_number)}`)} 
+                          title="Edit Record"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" className="text-red-500 hover:text-red-400 hover:bg-red-500/10 px-2 py-1" onClick={() => handleDelete(student.application_number)} title="Delete Record">
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </td>
                     </tr>
