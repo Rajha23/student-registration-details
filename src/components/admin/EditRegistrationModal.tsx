@@ -45,6 +45,7 @@ export const EditRegistrationModal = ({ applicationNumber, onClose, onSave }: Ed
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
+    application_number: '',
     name: '',
     email: '',
     mobile_number: '',
@@ -63,6 +64,7 @@ export const EditRegistrationModal = ({ applicationNumber, onClose, onSave }: Ed
 
         if (data) {
           setFormData({
+            application_number: data.application_number || '',
             name: data.name || '',
             email: data.email || '',
             mobile_number: data.mobile_number || '',
@@ -95,9 +97,26 @@ export const EditRegistrationModal = ({ applicationNumber, onClose, onSave }: Ed
     setIsSaving(true);
     
     try {
+      const newAppNumber = formData.application_number.trim();
+      
+      if (newAppNumber !== applicationNumber) {
+        // First check if the new application number already exists
+        const { data: existing } = await supabase
+          .from('student_profiles')
+          .select('application_number')
+          .eq('application_number', newAppNumber)
+          .maybeSingle();
+          
+        if (existing) {
+          throw new Error(`Application Number ${newAppNumber} already exists!`);
+        }
+      }
+
+      // Update student_profiles (even if app number changed, Supabase allows PK updates if no restrictive FK constraints)
       const { error } = await supabase
         .from('student_profiles')
         .update({
+          application_number: newAppNumber,
           name: formData.name,
           email: formData.email,
           mobile_number: formData.mobile_number,
@@ -109,10 +128,11 @@ export const EditRegistrationModal = ({ applicationNumber, onClose, onSave }: Ed
 
       if (error) throw error;
       
-      // Attempt to sync basic details with first_year_data if it exists
+      // Sync basic details with first_year_data if it exists
       await supabase
         .from('first_year_data')
         .update({
+          application_number: newAppNumber,
           student_name: formData.name,
           email: formData.email,
           mobile_number: formData.mobile_number,
@@ -120,6 +140,16 @@ export const EditRegistrationModal = ({ applicationNumber, onClose, onSave }: Ed
           course: formData.department
         })
         .eq('application_number', applicationNumber);
+        
+      // Update student_documents if application number changed
+      if (newAppNumber !== applicationNumber) {
+        await supabase
+          .from('student_documents')
+          .update({
+            application_number: newAppNumber
+          })
+          .eq('application_number', applicationNumber);
+      }
         
       onSave();
     } catch (err: any) {
@@ -159,6 +189,13 @@ export const EditRegistrationModal = ({ applicationNumber, onClose, onSave }: Ed
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                <Input 
+                  label="Application Number" 
+                  name="application_number"
+                  value={formData.application_number} 
+                  onChange={handleChange} 
+                  required 
+                />
                 <Input 
                   label="Student Name" 
                   name="name"
