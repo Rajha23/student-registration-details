@@ -50,10 +50,27 @@ export const StudentProfileModal = ({ applicationNumber, onClose, startInPrintMo
       }
 
       try {
-        const { data: fData } = await supabase.from('first_year_data').select('*').eq('application_number', applicationNumber).single();
+        const { data: fData } = await supabase.from('first_year_data').select('*').eq('application_number', applicationNumber).maybeSingle();
         const { data: dData } = await supabase.from('student_documents').select('*').eq('application_number', applicationNumber);
         
-        setFirstYearData(fData);
+        if (fData) {
+          setFirstYearData(fData);
+        } else {
+          // Fallback to student_profiles if form hasn't been started
+          const { data: profileData } = await supabase.from('student_profiles').select('*').eq('application_number', applicationNumber).maybeSingle();
+          if (profileData) {
+            setFirstYearData({
+              application_number: profileData.application_number,
+              student_name: profileData.name,
+              email: profileData.email,
+              mobile_number: profileData.mobile_number,
+              programme: profileData.course,
+              course: profileData.department,
+              status: 'Draft (Not Started)'
+            });
+          }
+        }
+        
         setDocumentsData(dData || []);
       } catch (err) {
         console.error("Error fetching profile", err);
@@ -172,7 +189,7 @@ export const StudentProfileModal = ({ applicationNumber, onClose, startInPrintMo
               </div>
             ) : !firstYearData ? (
               <div className="text-center p-8 text-text-secondary">
-                No profile details found for this folder number.
+                No profile details found for this application number.
               </div>
             ) : (
               <div className="space-y-6">
