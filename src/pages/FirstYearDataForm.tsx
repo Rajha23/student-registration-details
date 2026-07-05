@@ -75,6 +75,9 @@ export const FirstYearDataForm = () => {
   const twelfthDistrict = watch('twelfth_district');
   const twelfthBlock = watch('twelfth_block');
 
+  const tenthMarks = watch(['tenth_lang_mark', 'tenth_eng_mark', 'tenth_math_mark', 'tenth_sci_mark', 'tenth_soc_mark']);
+  const twelfthMarks = watch(['twelfth_lang_mark', 'twelfth_eng_mark', 'twelfth_sub1_mark', 'twelfth_sub2_mark', 'twelfth_sub3_mark', 'twelfth_sub4_mark']);
+
   const tenthDistrictOptions = Object.keys(schoolData).sort().map(d => ({ value: d, label: d }));
   const tenthBlockOptions = tenthDistrict && schoolData[tenthDistrict] 
     ? Object.keys(schoolData[tenthDistrict]).sort().map(b => ({ value: b, label: b })) : [];
@@ -131,9 +134,25 @@ export const FirstYearDataForm = () => {
   useEffect(() => {
     if (prevTwelfthBlock.current !== undefined && prevTwelfthBlock.current !== twelfthBlock) {
       setValue('twelfth_school', '', { shouldValidate: false });
+        prevTwelfthBlock.current = twelfthBlock;
     }
-    prevTwelfthBlock.current = twelfthBlock;
   }, [twelfthBlock, setValue]);
+
+  // Auto-calculate 10th Total Marks
+  useEffect(() => {
+    if (tenthMarks.some(m => m !== undefined && m !== '')) {
+      const total = tenthMarks.reduce((sum, mark) => sum + (parseInt(mark as string) || 0), 0);
+      setValue('tenth_total_marks', total.toString(), { shouldValidate: true });
+    }
+  }, [tenthMarks, setValue]);
+
+  // Auto-calculate 12th Total Marks
+  useEffect(() => {
+    if (twelfthMarks.some(m => m !== undefined && m !== '')) {
+      const total = twelfthMarks.reduce((sum, mark) => sum + (parseInt(mark as string) || 0), 0);
+      setValue('twelfth_total_marks', total.toString(), { shouldValidate: true });
+    }
+  }, [twelfthMarks, setValue]);
 
   useEffect(() => {
     if (prevResidence.current !== undefined && prevResidence.current !== residenceType) {
@@ -602,7 +621,7 @@ export const FirstYearDataForm = () => {
                           <Input label="Maths" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('tenth_math_mark')} error={errors.tenth_math_mark?.message} required />
                           <Input label="Science" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('tenth_sci_mark')} error={errors.tenth_sci_mark?.message} required />
                           <Input label="Social" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('tenth_soc_mark')} error={errors.tenth_soc_mark?.message} required />
-                          <Input label="Total Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('tenth_total_marks')} error={errors.tenth_total_marks?.message} required className="bg-primary/5" />
+                          <Input label="Total Mark" readOnly {...register('tenth_total_marks')} error={errors.tenth_total_marks?.message} required className="bg-primary/5 cursor-not-allowed opacity-80" />
                         </div>
                       </div>
                     </div>
@@ -626,7 +645,7 @@ export const FirstYearDataForm = () => {
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-4">
                           <Input label="Language Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_lang_mark')} error={errors.twelfth_lang_mark?.message} required />
                           <Input label="English Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_eng_mark')} error={errors.twelfth_eng_mark?.message} required />
-                          <Input label="Total Mark (Out of 600)" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_total_marks')} error={errors.twelfth_total_marks?.message} required className="bg-primary/5" />
+                          <Input label="Total Mark (Out of 600)" readOnly {...register('twelfth_total_marks')} error={errors.twelfth_total_marks?.message} required className="bg-primary/5 cursor-not-allowed opacity-80" />
                         </div>
                         
                         <div className="grid md:grid-cols-2 gap-x-8 gap-y-4 mb-4 p-4 bg-white/5 rounded-lg border border-white/5">
