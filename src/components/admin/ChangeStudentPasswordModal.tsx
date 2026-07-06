@@ -3,6 +3,7 @@ import { X, Save, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../supabase/client';
 import { Input } from '../ui/Input';
+import { SearchableSelect } from '../ui/SearchableSelect';
 import { Button } from '../ui/Button';
 
 interface ChangeStudentPasswordModalProps {
@@ -12,13 +13,41 @@ interface ChangeStudentPasswordModalProps {
 
 export const ChangeStudentPasswordModal = ({ onClose, onSuccess }: ChangeStudentPasswordModalProps) => {
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [appNumberOptions, setAppNumberOptions] = useState<{value: string, label: string}[]>([]);
   const [formData, setFormData] = useState({
     application_number: '',
     new_password: ''
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  React.useEffect(() => {
+    const fetchAppNumbers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('student_profiles')
+          .select('application_number, name')
+          .order('application_number');
+          
+        if (error) throw error;
+        
+        if (data) {
+          setAppNumberOptions(data.map(profile => ({
+            value: profile.application_number,
+            label: `${profile.application_number} - ${profile.name || 'Unknown'}`
+          })));
+        }
+      } catch (err) {
+        console.error("Error fetching application numbers", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchAppNumbers();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -93,13 +122,14 @@ export const ChangeStudentPasswordModal = ({ onClose, onSuccess }: ChangeStudent
 
           <div className="p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
-              <Input 
+              <SearchableSelect 
                 label="Application Number" 
                 name="application_number"
                 value={formData.application_number} 
                 onChange={handleChange} 
                 required 
-                placeholder="e.g. AB1234"
+                options={appNumberOptions}
+                disabled={isLoading}
               />
               
               <div className="relative">
