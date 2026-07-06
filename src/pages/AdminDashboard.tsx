@@ -109,9 +109,10 @@ export const AdminDashboard = () => {
     }
   };
 
-  const handleApproveEditRequest = async (applicationNumber: string) => {
+  const handleApproveEditRequest = async (applicationNumber: string, studentName: string) => {
     try {
-      await supabase.from('first_year_data').update({ status: 'draft' }).eq('application_number', applicationNumber);
+      const cleanName = studentName.split('| EDIT_REQUEST:')[0].trim();
+      await supabase.from('first_year_data').update({ status: 'draft', student_name: cleanName }).eq('application_number', applicationNumber);
       showSuccess('Edit request approved');
       fetchData();
     } catch (e) {
@@ -119,9 +120,10 @@ export const AdminDashboard = () => {
     }
   };
 
-  const handleRejectEditRequest = async (applicationNumber: string) => {
+  const handleRejectEditRequest = async (applicationNumber: string, studentName: string) => {
     try {
-      await supabase.from('first_year_data').update({ status: 'submitted' }).eq('application_number', applicationNumber);
+      const cleanName = studentName.split('| EDIT_REQUEST:')[0].trim();
+      await supabase.from('first_year_data').update({ student_name: cleanName }).eq('application_number', applicationNumber);
       showSuccess('Edit request rejected');
       fetchData();
     } catch (e) {
@@ -279,8 +281,8 @@ export const AdminDashboard = () => {
     student.application_number?.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
-  const regularSubmissions = filteredStudents.filter(s => !s.status?.startsWith('edit_requested:'));
-  const editRequests = filteredStudents.filter(s => s.status?.startsWith('edit_requested:'));
+  const regularSubmissions = filteredStudents.filter(s => !s.student_name?.includes('| EDIT_REQUEST:'));
+  const editRequests = filteredStudents.filter(s => s.student_name?.includes('| EDIT_REQUEST:'));
 
   const filteredRegistered = registeredStudents.filter(student => 
     student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -533,22 +535,22 @@ export const AdminDashboard = () => {
                   editRequests.map((student) => (
                     <tr key={student.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                       <td className="p-4 font-medium">{student.application_number || '-'}</td>
-                      <td className="p-4">{student.student_name || 'N/A'}</td>
+                      <td className="p-4">{student.student_name ? student.student_name.split('| EDIT_REQUEST:')[0].trim() : 'N/A'}</td>
                       <td className="p-4 text-text-secondary">{student.email}</td>
                       <td className="p-4 text-text-secondary whitespace-nowrap">{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
-                      <td className="p-4 text-yellow-500 italic max-w-[200px] truncate" title={student.status.replace('edit_requested:', '')}>
-                        "{student.status.replace('edit_requested:', '')}"
+                      <td className="p-4 text-yellow-500 italic max-w-[200px] truncate" title={student.student_name ? student.student_name.split('| EDIT_REQUEST:')[1] : ''}>
+                        "{student.student_name ? student.student_name.split('| EDIT_REQUEST:')[1] : ''}"
                       </td>
                       <td className="p-4 text-right whitespace-nowrap">
                         <Button 
                           className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 mr-2 h-8 text-sm" 
-                          onClick={() => handleApproveEditRequest(student.application_number)}
+                          onClick={() => handleApproveEditRequest(student.application_number, student.student_name)}
                         >
                           Approve
                         </Button>
                         <Button 
                           className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 mr-2 h-8 text-sm" 
-                          onClick={() => handleRejectEditRequest(student.application_number)}
+                          onClick={() => handleRejectEditRequest(student.application_number, student.student_name)}
                         >
                           Reject
                         </Button>

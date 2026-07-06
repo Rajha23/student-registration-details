@@ -255,7 +255,10 @@ export const FirstYearDataForm = () => {
         .maybeSingle();
 
       if (draftData) {
-        if (draftData.status === 'submitted' || draftData.status?.startsWith('edit_requested:')) {
+        if (draftData.student_name && draftData.student_name.includes('| EDIT_REQUEST:')) {
+          setIsSubmittedForm(true);
+          draftData.student_name = draftData.student_name.split('| EDIT_REQUEST:')[0].trim();
+        } else if (draftData.status === 'submitted') {
           setIsSubmittedForm(true);
         }
 

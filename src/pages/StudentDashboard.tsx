@@ -32,10 +32,10 @@ export const StudentDashboard = () => {
       if (!isConfigured) return; // In mock mode, we just leave them as Not Started for visual demo
 
       try {
-        const { data: fData } = await supabase.from('first_year_data').select('status').eq('application_number', fn).single();
+        const { data: fData } = await supabase.from('first_year_data').select('status, student_name').eq('application_number', fn).single();
         if (fData) {
-          if (fData.status === 'submitted') setForm2Status('Completed');
-          else if (fData.status.startsWith('edit_requested:')) setForm2Status('Edit Requested');
+          if (fData.student_name?.includes('| EDIT_REQUEST:')) setForm2Status('Edit Requested');
+          else if (fData.status === 'submitted') setForm2Status('Completed');
           else setForm2Status('Pending');
         }
 
@@ -56,7 +56,11 @@ export const StudentDashboard = () => {
     if (!editReason.trim()) return;
     setIsSubmittingEditRequest(true);
     try {
-      const { error } = await supabase.from('first_year_data').update({ status: `edit_requested:${editReason}` }).eq('application_number', applicationNumber);
+      const { data: fData } = await supabase.from('first_year_data').select('student_name').eq('application_number', applicationNumber).single();
+      const currentName = fData?.student_name ? fData.student_name.split('| EDIT_REQUEST:')[0].trim() : '';
+      const newName = `${currentName} | EDIT_REQUEST: ${editReason}`;
+      
+      const { error } = await supabase.from('first_year_data').update({ student_name: newName }).eq('application_number', applicationNumber);
       if (error) throw error;
       setForm2Status('Edit Requested');
       setIsEditModalOpen(false);
