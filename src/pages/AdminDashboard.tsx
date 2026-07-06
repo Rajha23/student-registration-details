@@ -353,7 +353,7 @@ export const AdminDashboard = () => {
           <div className="p-6">
             <h2 className="text-xl font-bold mb-6">Account Management</h2>
             <div className="grid md:grid-cols-3 gap-6">
-              <Card className="p-6 bg-white/5 border-white/10 hover:bg-white/10 transition-colors">
+              <Card className="p-6 bg-white/5 border-white/10 hover:bg-white/10 transition-colors flex flex-col h-full">
                 <h3 className="text-lg font-bold text-primary mb-2">Student Logins</h3>
                 <p className="text-text-secondary text-sm mb-6">
                   Manually register a new student and generate their login credentials. They can then log in and complete the full admission form.
@@ -366,7 +366,7 @@ export const AdminDashboard = () => {
                 </Button>
               </Card>
 
-              <Card className="p-6 bg-white/5 border-white/10 hover:bg-white/10 transition-colors">
+              <Card className="p-6 bg-white/5 border-white/10 hover:bg-white/10 transition-colors flex flex-col h-full">
                 <h3 className="text-lg font-bold text-blue-400 mb-2">Administrator Profiles</h3>
                 <p className="text-text-secondary text-sm mb-6">
                   Invite a new administrator to the dashboard. They will have full access to view, edit, and print student records.
@@ -379,7 +379,7 @@ export const AdminDashboard = () => {
                 </Button>
               </Card>
               
-              <Card className="p-6 bg-white/5 border-white/10 hover:bg-white/10 transition-colors flex flex-col">
+              <Card className="p-6 bg-white/5 border-white/10 hover:bg-white/10 transition-colors flex flex-col h-full">
                 <h3 className="text-lg font-bold text-red-400 mb-2">Change Password</h3>
                 <p className="text-text-secondary text-sm mb-6">
                   Reset or change the password for an existing student account. You will need their Application Number.
