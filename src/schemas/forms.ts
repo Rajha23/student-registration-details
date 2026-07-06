@@ -101,16 +101,20 @@ export const firstYearDataSchema = z.object({
   twelfth_block: z.string().min(1, "12th Block is required"),
   twelfth_school: z.string().min(1, "12th School is required"),
   twelfth_total_marks: z.string().min(1, "Required").regex(/^\d+$/, "Must be a number"),
-  twelfth_lang_mark: z.string().min(1, "Required").regex(/^\d+$/, "Must be a number"),
-  twelfth_eng_mark: z.string().min(1, "Required").regex(/^\d+$/, "Must be a number"),
-  twelfth_sub1_name: z.string().min(1, "Required"),
-  twelfth_sub1_mark: z.string().min(1, "Required").regex(/^\d+$/, "Must be a number"),
-  twelfth_sub2_name: z.string().min(1, "Required"),
-  twelfth_sub2_mark: z.string().min(1, "Required").regex(/^\d+$/, "Must be a number"),
-  twelfth_sub3_name: z.string().min(1, "Required"),
-  twelfth_sub3_mark: z.string().min(1, "Required").regex(/^\d+$/, "Must be a number"),
-  twelfth_sub4_name: z.string().min(1, "Required"),
-  twelfth_sub4_mark: z.string().min(1, "Required").regex(/^\d+$/, "Must be a number"),
+  twelfth_lang_mark: z.string().optional(),
+  twelfth_eng_mark: z.string().optional(),
+  twelfth_sub1_name: z.string().optional(),
+  twelfth_sub1_mark: z.string().optional(),
+  twelfth_sub2_name: z.string().optional(),
+  twelfth_sub2_mark: z.string().optional(),
+  twelfth_sub3_name: z.string().optional(),
+  twelfth_sub3_mark: z.string().optional(),
+  twelfth_sub4_name: z.string().optional(),
+  twelfth_sub4_mark: z.string().optional(),
+  icse_subjects: z.array(z.object({
+    name: z.string().min(1, "Subject name is required"),
+    mark: z.string().min(1, "Mark is required").regex(/^\d+$/, "Must be a number")
+  })).optional(),
 }).superRefine((data, ctx) => {
   if (data.residence_type === 'Dayscholar') {
     if (!data.transport_mode) {

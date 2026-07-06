@@ -369,17 +369,41 @@ export const StudentProfileModal = ({ applicationNumber, onClose, startInPrintMo
                           </div>
                           <div className="col-span-2 bg-white/5 p-4 rounded-lg">
                             <h4 className="text-sm font-medium text-text-secondary mb-3">12th Marks (Out of 100 per subject)</h4>
-                            <div className="grid grid-cols-3 gap-4 mb-4">
-                              <Field label="Language" value={firstYearData.twelfth_lang_mark} />
-                              <Field label="English" value={firstYearData.twelfth_eng_mark} />
-                              <Field label="Total (Out of 600)" value={firstYearData.twelfth_total_marks} />
-                            </div>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                              <Field label={firstYearData.twelfth_sub1_name || "Subject 1"} value={firstYearData.twelfth_sub1_mark} />
-                              <Field label={firstYearData.twelfth_sub2_name || "Subject 2"} value={firstYearData.twelfth_sub2_mark} />
-                              <Field label={firstYearData.twelfth_sub3_name || "Subject 3"} value={firstYearData.twelfth_sub3_mark} />
-                              <Field label={firstYearData.twelfth_sub4_name || "Subject 4"} value={firstYearData.twelfth_sub4_mark} />
-                            </div>
+                            {firstYearData.twelfth_board === 'ICSE' ? (
+                              <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4 border-b border-white/10 pb-4">
+                                  <Field label="Total Mark" value={firstYearData.twelfth_total_marks} />
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                  {(() => {
+                                    try {
+                                      const subjects = JSON.parse(firstYearData.twelfth_sub1_name || '[]');
+                                      return subjects.map((sub: any, i: number) => (
+                                        <Field key={i} label={sub.name || `Subject ${i+1}`} value={sub.mark} />
+                                      ));
+                                    } catch (e) {
+                                      return <div className="text-red-400">Error parsing ICSE subjects</div>;
+                                    }
+                                  })()}
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="grid grid-cols-3 gap-4 mb-4">
+                                  {firstYearData.twelfth_board !== 'CBSE' && (
+                                    <Field label="Language" value={firstYearData.twelfth_lang_mark} />
+                                  )}
+                                  <Field label="English" value={firstYearData.twelfth_eng_mark} />
+                                  <Field label="Total Mark" value={firstYearData.twelfth_total_marks} />
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                  <Field label={firstYearData.twelfth_sub1_name || "Subject 1"} value={firstYearData.twelfth_sub1_mark} />
+                                  <Field label={firstYearData.twelfth_sub2_name || "Subject 2"} value={firstYearData.twelfth_sub2_mark} />
+                                  <Field label={firstYearData.twelfth_sub3_name || "Subject 3"} value={firstYearData.twelfth_sub3_mark} />
+                                  <Field label={firstYearData.twelfth_sub4_name || "Subject 4"} value={firstYearData.twelfth_sub4_mark} />
+                                </div>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>

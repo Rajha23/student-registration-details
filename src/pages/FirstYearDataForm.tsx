@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -48,9 +48,17 @@ export const FirstYearDataForm = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, handleSubmit, trigger, watch, setValue, formState: { errors } } = useForm<FirstYearDataFormData>({
+  const { register, handleSubmit, trigger, control, watch, setValue, formState: { errors } } = useForm<FirstYearDataFormData>({
     resolver: zodResolver(firstYearDataSchema),
     mode: 'onTouched',
+    defaultValues: {
+      icse_subjects: [{ name: '', mark: '' }]
+    }
+  });
+
+  const { fields: icseFields, append: appendIcse, remove: removeIcse } = useFieldArray({
+    control,
+    name: "icse_subjects" as any
   });
 
   const firstGraduate = watch('first_graduate');
@@ -77,6 +85,8 @@ export const FirstYearDataForm = () => {
 
   const tenthMarks = watch(['tenth_lang_mark', 'tenth_eng_mark', 'tenth_math_mark', 'tenth_sci_mark', 'tenth_soc_mark']);
   const twelfthMarks = watch(['twelfth_lang_mark', 'twelfth_eng_mark', 'twelfth_sub1_mark', 'twelfth_sub2_mark', 'twelfth_sub3_mark', 'twelfth_sub4_mark']);
+  const twelfthBoard = watch('twelfth_board');
+  const icseSubjects = watch('icse_subjects');
 
   const tenthDistrictOptions = Object.keys(schoolData).sort().map(d => ({ value: d, label: d }));
   const tenthBlockOptions = tenthDistrict && schoolData[tenthDistrict] 
@@ -149,12 +159,21 @@ export const FirstYearDataForm = () => {
 
   // Auto-calculate 12th Total Marks
   const twelfthMarksJson = JSON.stringify(twelfthMarks);
+  const icseSubjectsJson = JSON.stringify(icseSubjects);
+  
   useEffect(() => {
-    if (twelfthMarks.some(m => m !== undefined && m !== '')) {
-      const total = twelfthMarks.reduce((sum, mark) => sum + (parseInt(mark as string) || 0), 0);
-      setValue('twelfth_total_marks', total.toString(), { shouldValidate: true });
+    if (twelfthBoard === 'ICSE') {
+      if (icseSubjects && icseSubjects.length > 0) {
+        const total = icseSubjects.reduce((sum: number, subj: any) => sum + (parseInt(subj.mark as string) || 0), 0);
+        setValue('twelfth_total_marks', total.toString(), { shouldValidate: true });
+      }
+    } else {
+      if (twelfthMarks.some(m => m !== undefined && m !== '')) {
+        const total = twelfthMarks.reduce((sum, mark) => sum + (parseInt(mark as string) || 0), 0);
+        setValue('twelfth_total_marks', total.toString(), { shouldValidate: true });
+      }
     }
-  }, [twelfthMarksJson, setValue]);
+  }, [twelfthMarksJson, icseSubjectsJson, twelfthBoard, setValue]);
 
   useEffect(() => {
     if (prevResidence.current !== undefined && prevResidence.current !== residenceType) {
@@ -241,6 +260,11 @@ export const FirstYearDataForm = () => {
              setValue(key, draftData[key] || '');
           }
         });
+        if (draftData.twelfth_board === 'ICSE' && draftData.twelfth_sub1_name) {
+          try {
+            setValue('icse_subjects', JSON.parse(draftData.twelfth_sub1_name));
+          } catch(e) {}
+        }
       } else {
         // No draft exists, fetch from student_profiles for pre-fill
         const { data: profileData } = await supabase
@@ -256,6 +280,12 @@ export const FirstYearDataForm = () => {
           // Map Course -> Programme/Degree and Department -> Course/Department if we stored it
           if (profileData.course) setValue('programme', profileData.course);
           if (profileData.department) setValue('course', profileData.department);
+          
+          if (profileData.twelfth_board === 'ICSE' && profileData.twelfth_sub1_name) {
+            try {
+              setValue('icse_subjects', JSON.parse(profileData.twelfth_sub1_name));
+            } catch(e) {}
+          }
         }
       }
       
@@ -293,8 +323,7 @@ export const FirstYearDataForm = () => {
     } else if (currentStep === 2) {
       fieldsToValidate = ['religion', 'community', 'caste_name', 'father_income', 'mother_income', 'guardian_income', 'first_graduate', 'apply_pmss_scholarship', 'apply_bc_mbc_scholarship', 'emis_number', 'date_of_document_submission', 
       'tenth_board', 'tenth_medium', 'tenth_district', 'tenth_block', 'tenth_school', 'tenth_total_marks', 'tenth_lang_mark', 'tenth_eng_mark', 'tenth_math_mark', 'tenth_sci_mark', 'tenth_soc_mark',
-      'twelfth_board', 'twelfth_medium', 'twelfth_district', 'twelfth_block', 'twelfth_school', 'twelfth_total_marks', 'twelfth_lang_mark', 'twelfth_eng_mark', 'twelfth_sub1_name', 'twelfth_sub1_mark', 'twelfth_sub2_name', 'twelfth_sub2_mark', 'twelfth_sub3_name', 'twelfth_sub3_mark', 'twelfth_sub4_name', 'twelfth_sub4_mark',
-      ...(community === 'Other' ? ['community_other'] : []), ...(community !== 'OC' ? ['community_certificate_number'] : [])];
+      'twelfth_board', 'twelfth_medium', 'twelfth_district', 'twelfth_block', 'twelfth_school', 'twelfth_total_marks', ...(community === 'Other' ? ['community_other'] : []), ...(community !== 'OC' ? ['community_certificate_number'] : [])];
     }
     
     const isStepValid = await trigger(fieldsToValidate);
@@ -305,7 +334,7 @@ export const FirstYearDataForm = () => {
     setCurrentStep((prev) => prev - 1);
   };
 
-  const handleSaveDraft = async (data: Partial<FirstYearDataFormData>) => {
+  const handleSaveDraft = async (data: any) => {
     if (!applicationNumber) return;
     setIsSaving(true);
     
@@ -317,13 +346,18 @@ export const FirstYearDataForm = () => {
       }, 500);
       return;
     }
+    const payload: any = { ...data };
+    if (payload.twelfth_board === 'ICSE') {
+      payload.twelfth_sub1_name = JSON.stringify(payload.icse_subjects || []);
+    }
+    delete payload.icse_subjects;
 
     try {
       const { error } = await supabase
         .from('first_year_data')
         .upsert({
           status: 'draft',
-          ...data,
+          ...payload,
           application_number: applicationNumber
         }, { onConflict: 'application_number' });
         
@@ -336,9 +370,15 @@ export const FirstYearDataForm = () => {
     }
   };
 
-  const onSubmit = async (data: FirstYearDataFormData) => {
+  const onSubmit = async (data: any) => {
     if (!applicationNumber) return;
     setIsSubmitting(true);
+    
+    const payload: any = { ...data };
+    if (payload.twelfth_board === 'ICSE') {
+      payload.twelfth_sub1_name = JSON.stringify(payload.icse_subjects || []);
+    }
+    delete payload.icse_subjects;
 
     const isConfigured = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
     if (!isConfigured) {
@@ -357,7 +397,7 @@ export const FirstYearDataForm = () => {
         .from('first_year_data')
         .upsert({
           status: 'submitted',
-          ...data,
+          ...payload,
           application_number: applicationNumber
         }, { onConflict: 'application_number' });
         
@@ -648,34 +688,66 @@ export const FirstYearDataForm = () => {
                         <SearchableSelect label="School" {...register('twelfth_school')} value={watch('twelfth_school')} error={errors.twelfth_school?.message} required options={twelfthSchoolOptions} disabled={!twelfthBlock} />
                       </div>
                       
-                      <div className="md:col-span-2 mt-2">
-                        <h4 className="text-sm font-medium text-text-secondary mb-3">12th Marks (Out of 100 per subject)</h4>
-                        
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-4">
-                          <Input label="Language Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_lang_mark')} error={errors.twelfth_lang_mark?.message} required />
-                          <Input label="English Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_eng_mark')} error={errors.twelfth_eng_mark?.message} required />
-                          <Input label="Total Mark (Out of 600)" readOnly {...register('twelfth_total_marks')} error={errors.twelfth_total_marks?.message} required className="bg-primary/5 cursor-not-allowed opacity-80" />
+                      <Input label="12th Total Marks" readOnly={watch('twelfth_board') === 'ICSE'} {...register('twelfth_total_marks')} error={errors.twelfth_total_marks?.message} required className={watch('twelfth_board') === 'ICSE' ? "bg-primary/5 cursor-not-allowed opacity-80" : ""} />
+                      
+                      {watch('twelfth_board') === 'ICSE' ? (
+                        <div className="col-span-1 md:col-span-2 space-y-4 border border-white/10 p-4 rounded-lg bg-white/5 mt-2">
+                          <div className="flex justify-between items-center mb-2 border-b border-white/10 pb-3">
+                            <h4 className="font-medium text-purple-400">ICSE Subjects</h4>
+                            <Button type="button" variant="outline" className="text-sm py-1 px-3" onClick={() => appendIcse({ name: '', mark: '' })}>
+                              + Add Subject
+                            </Button>
+                          </div>
+                          <div className="space-y-4">
+                            {icseFields.map((field, index) => (
+                              <div key={field.id} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                                <div className="md:col-span-2">
+                                  <Input label={`Subject ${index + 1} Name`} {...register(`icse_subjects.${index}.name` as const)} error={errors.icse_subjects?.[index]?.name?.message} required />
+                                </div>
+                                <div className="flex gap-2">
+                                  <div className="flex-1">
+                                    <Input label="Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register(`icse_subjects.${index}.mark` as const)} error={errors.icse_subjects?.[index]?.mark?.message} required />
+                                  </div>
+                                  <Button type="button" variant="ghost" onClick={() => removeIcse(index)} className="text-red-400 hover:text-red-300 mt-[34px]">
+                                    Remove
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        
-                        <div className="grid md:grid-cols-2 gap-x-8 gap-y-4 mb-4 p-4 bg-white/5 rounded-lg border border-white/5">
-                          <div className="grid grid-cols-2 gap-4">
-                            <Input label="Subject 1 Name" placeholder="e.g. Physics" {...register('twelfth_sub1_name')} error={errors.twelfth_sub1_name?.message} required />
-                            <Input label="Subject 1 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub1_mark')} error={errors.twelfth_sub1_mark?.message} required />
+                      ) : (
+                        <div className="col-span-1 md:col-span-2 mt-2">
+                          <h4 className="text-sm font-medium text-text-secondary mb-3">12th Marks (Out of 100 per subject)</h4>
+                          
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-4">
+                            {watch('twelfth_board') !== 'CBSE' && (
+                              <Input label="Language Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_lang_mark')} error={errors.twelfth_lang_mark?.message} required />
+                            )}
+                            <Input label="English Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_eng_mark')} error={errors.twelfth_eng_mark?.message} required />
+                            <Input label="Total Mark (Out of 600)" readOnly {...register('twelfth_total_marks')} error={errors.twelfth_total_marks?.message} required className="bg-primary/5 cursor-not-allowed opacity-80" />
                           </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <Input label="Subject 2 Name" placeholder="e.g. Chemistry" {...register('twelfth_sub2_name')} error={errors.twelfth_sub2_name?.message} required />
-                            <Input label="Subject 2 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub2_mark')} error={errors.twelfth_sub2_mark?.message} required />
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <Input label="Subject 3 Name" placeholder="e.g. Maths" {...register('twelfth_sub3_name')} error={errors.twelfth_sub3_name?.message} required />
-                            <Input label="Subject 3 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub3_mark')} error={errors.twelfth_sub3_mark?.message} required />
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <Input label="Subject 4 Name" placeholder="e.g. Computer Science" {...register('twelfth_sub4_name')} error={errors.twelfth_sub4_name?.message} required />
-                            <Input label="Subject 4 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub4_mark')} error={errors.twelfth_sub4_mark?.message} required />
+                          
+                          <div className="grid md:grid-cols-2 gap-x-8 gap-y-4 mb-4 p-4 bg-white/5 rounded-lg border border-white/5">
+                            <div className="grid grid-cols-2 gap-4">
+                              <Input label="Subject 1 Name" placeholder="e.g. Physics" {...register('twelfth_sub1_name')} error={errors.twelfth_sub1_name?.message} required />
+                              <Input label="Subject 1 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub1_mark')} error={errors.twelfth_sub1_mark?.message} required />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <Input label="Subject 2 Name" placeholder="e.g. Chemistry" {...register('twelfth_sub2_name')} error={errors.twelfth_sub2_name?.message} required />
+                              <Input label="Subject 2 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub2_mark')} error={errors.twelfth_sub2_mark?.message} required />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <Input label="Subject 3 Name" placeholder="e.g. Maths" {...register('twelfth_sub3_name')} error={errors.twelfth_sub3_name?.message} required />
+                              <Input label="Subject 3 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub3_mark')} error={errors.twelfth_sub3_mark?.message} required />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <Input label="Subject 4 Name" placeholder="e.g. Computer Science" {...register('twelfth_sub4_name')} error={errors.twelfth_sub4_name?.message} required />
+                              <Input label="Subject 4 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub4_mark')} error={errors.twelfth_sub4_mark?.message} required />
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
 
