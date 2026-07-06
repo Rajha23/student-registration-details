@@ -19,7 +19,7 @@ export const AdminDashboard = () => {
   const [students, setStudents] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'submissions' | 'registered' | 'accounts'>('submissions');
+  const [activeTab, setActiveTab] = useState<'submissions' | 'registered' | 'accounts' | 'edit_requests'>('submissions');
   const [registeredStudents, setRegisteredStudents] = useState<any[]>([]);
   const [selectedFolderNumber, setSelectedFolderNumber] = useState<string | null>(null);
   const [editRegistrationApp, setEditRegistrationApp] = useState<string | null>(null);
@@ -98,17 +98,34 @@ export const AdminDashboard = () => {
       await supabase.from('student_documents').delete().eq('application_number', applicationNumber);
       await supabase.from('first_year_data').delete().eq('application_number', applicationNumber);
       const { error } = await supabase.from('student_profiles').delete().eq('application_number', applicationNumber);
+      
+      if (error) throw error;
+      
+      showSuccess(`Record ${applicationNumber} deleted successfully`);
+      fetchData();
+    } catch (error) {
+      console.error("Error deleting record:", error);
+      alert("Failed to delete record. It might be linked to other data.");
+    }
+  };
 
-      if (error) {
-        alert("Failed to delete record: " + error.message);
-      } else {
-        setStudents(prev => prev.filter(s => s.application_number !== applicationNumber));
-        setRegisteredStudents(prev => prev.filter(s => s.application_number !== applicationNumber));
-        fetchData();
-        alert("Record deleted successfully.");
-      }
-    } catch (err) {
-      alert("An unexpected error occurred while deleting.");
+  const handleApproveEditRequest = async (applicationNumber: string) => {
+    try {
+      await supabase.from('first_year_data').update({ status: 'draft' }).eq('application_number', applicationNumber);
+      showSuccess('Edit request approved');
+      fetchData();
+    } catch (e) {
+      alert('Error approving request');
+    }
+  };
+
+  const handleRejectEditRequest = async (applicationNumber: string) => {
+    try {
+      await supabase.from('first_year_data').update({ status: 'submitted' }).eq('application_number', applicationNumber);
+      showSuccess('Edit request rejected');
+      fetchData();
+    } catch (e) {
+      alert('Error rejecting request');
     }
   };
 
@@ -261,6 +278,9 @@ export const AdminDashboard = () => {
     student.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     student.application_number?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
+  const regularSubmissions = filteredStudents.filter(s => !s.status?.startsWith('edit_requested:'));
+  const editRequests = filteredStudents.filter(s => s.status?.startsWith('edit_requested:'));
 
   const filteredRegistered = registeredStudents.filter(student => 
     student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -346,6 +366,18 @@ export const AdminDashboard = () => {
         >
           Account Management
         </Button>
+        <Button 
+          variant={activeTab === 'edit_requests' ? 'primary' : 'ghost'} 
+          onClick={() => setActiveTab('edit_requests')}
+          className={activeTab === 'edit_requests' ? '' : 'text-text-secondary hover:text-white'}
+        >
+          Edit Requests
+          {editRequests.length > 0 && (
+            <span className="ml-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              {editRequests.length}
+            </span>
+          )}
+        </Button>
       </div>
 
       <Card className="flex-1 min-h-[500px]">
@@ -396,7 +428,20 @@ export const AdminDashboard = () => {
         ) : (
           <>
             <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
-              <h2 className="text-xl font-bold">{activeTab === 'submissions' ? 'Student Records' : 'Registered Students'}</h2>
+              <div className="flex items-center">
+                {successMessage && (
+                  <div className="bg-green-500/20 text-green-400 px-4 py-2 rounded-lg flex items-center mb-4 md:mb-0 md:mr-4 border border-green-500/30">
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    {successMessage}
+                  </div>
+                )}
+                <div>
+                  <h2 className="text-xl font-bold">{activeTab === 'submissions' ? 'Student Records' : activeTab === 'edit_requests' ? 'Edit Requests' : 'Registered Students'}</h2>
+                  <p className="text-sm text-text-secondary">
+                    {activeTab === 'submissions' ? `${regularSubmissions.length} records found` : activeTab === 'edit_requests' ? `${editRequests.length} requests pending` : `${filteredRegistered.length} profiles found`}
+                  </p>
+                </div>
+              </div>
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-3.5 w-4 h-4 text-text-secondary pointer-events-none" />
             <Input 
@@ -421,6 +466,7 @@ export const AdminDashboard = () => {
                 {activeTab === 'registered' && <th className="p-4 font-medium text-text-secondary">Course</th>}
                 {activeTab === 'submissions' && <th className="p-4 font-medium text-text-secondary">Status</th>}
                 {activeTab === 'registered' && <th className="p-4 font-medium text-text-secondary">Mobile</th>}
+                {activeTab === 'edit_requests' && <th className="p-4 font-medium text-text-secondary">Reason</th>}
                 <th className="p-4 font-medium text-text-secondary text-right">Actions</th>
               </tr>
             </thead>
@@ -430,12 +476,12 @@ export const AdminDashboard = () => {
                   <td colSpan={7} className="p-8 text-center text-text-secondary">Loading records...</td>
                 </tr>
               ) : activeTab === 'submissions' ? (
-                filteredStudents.length === 0 ? (
+                regularSubmissions.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="p-8 text-center text-text-secondary">No records found.</td>
                   </tr>
                 ) : (
-                filteredStudents.map((student) => (
+                regularSubmissions.map((student) => (
                   <tr key={student.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                     <td className="p-4 font-medium">{student.application_number || '-'}</td>
                     <td className="p-4">{student.student_name || 'N/A'}</td>
@@ -477,6 +523,45 @@ export const AdminDashboard = () => {
                     </td>
                   </tr>
                 ))
+                )
+              ) : activeTab === 'edit_requests' ? (
+                editRequests.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="p-8 text-center text-text-secondary">No edit requests pending.</td>
+                  </tr>
+                ) : (
+                  editRequests.map((student) => (
+                    <tr key={student.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                      <td className="p-4 font-medium">{student.application_number || '-'}</td>
+                      <td className="p-4">{student.student_name || 'N/A'}</td>
+                      <td className="p-4 text-text-secondary">{student.email}</td>
+                      <td className="p-4 text-text-secondary whitespace-nowrap">{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
+                      <td className="p-4 text-yellow-500 italic max-w-[200px] truncate" title={student.status.replace('edit_requested:', '')}>
+                        "{student.status.replace('edit_requested:', '')}"
+                      </td>
+                      <td className="p-4 text-right whitespace-nowrap">
+                        <Button 
+                          className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 mr-2 h-8 text-sm" 
+                          onClick={() => handleApproveEditRequest(student.application_number)}
+                        >
+                          Approve
+                        </Button>
+                        <Button 
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 mr-2 h-8 text-sm" 
+                          onClick={() => handleRejectEditRequest(student.application_number)}
+                        >
+                          Reject
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          className="text-primary hover:text-white px-3 py-1" 
+                          onClick={() => { setSelectedFolderNumber(student.application_number); setModalViewMode('full'); setPrintMode(false); }}
+                        >
+                          View Form
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
                 )
               ) : (
                 filteredRegistered.length === 0 ? (

@@ -253,9 +253,9 @@ export const FirstYearDataForm = () => {
         .select('*')
         .eq('application_number', fn)
         .maybeSingle();
-        
+
       if (draftData) {
-        if (draftData.status === 'submitted') {
+        if (draftData.status === 'submitted' || draftData.status?.startsWith('edit_requested:')) {
           setIsSubmittedForm(true);
         }
 

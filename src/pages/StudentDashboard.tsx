@@ -9,8 +9,12 @@ import { supabase } from '../supabase/client';
 export const StudentDashboard = () => {
   const navigate = useNavigate();
   const [applicationNumber, setApplicationNumber] = useState<string | null>(null);
-  const [form2Status, setForm2Status] = useState<'Not Started' | 'Pending' | 'Completed'>('Not Started');
+  const [form2Status, setForm2Status] = useState<'Not Started' | 'Pending' | 'Completed' | 'Edit Requested'>('Not Started');
   const [form3Status, setForm3Status] = useState<'Not Started' | 'Completed'>('Not Started');
+  
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editReason, setEditReason] = useState('');
+  const [isSubmittingEditRequest, setIsSubmittingEditRequest] = useState(false);
   
   // Google Form link for document submission
   const GOOGLE_FORM_LINK = "https://docs.google.com/forms/d/1L0dCgwQah6IM5ajiKxJ5ya3iLQGvrein3K_ZLnBNDQg/viewform?ts=6a4b5ea4&edit_requested=true";
@@ -29,7 +33,11 @@ export const StudentDashboard = () => {
 
       try {
         const { data: fData } = await supabase.from('first_year_data').select('status').eq('application_number', fn).single();
-        if (fData) setForm2Status(fData.status === 'submitted' ? 'Completed' : 'Pending');
+        if (fData) {
+          if (fData.status === 'submitted') setForm2Status('Completed');
+          else if (fData.status.startsWith('edit_requested:')) setForm2Status('Edit Requested');
+          else setForm2Status('Pending');
+        }
 
         const docsSubmitted = localStorage.getItem(`docs_submitted_${fn}`);
         if (docsSubmitted === 'true') {
@@ -43,6 +51,22 @@ export const StudentDashboard = () => {
   }, [navigate]);
 
   if (!applicationNumber) return null;
+
+  const handleRequestEdit = async () => {
+    if (!editReason.trim()) return;
+    setIsSubmittingEditRequest(true);
+    try {
+      const { error } = await supabase.from('first_year_data').update({ status: `edit_requested:${editReason}` }).eq('application_number', applicationNumber);
+      if (error) throw error;
+      setForm2Status('Edit Requested');
+      setIsEditModalOpen(false);
+      setEditReason('');
+    } catch (err: any) {
+      alert("Error requesting edit: " + err.message);
+    } finally {
+      setIsSubmittingEditRequest(false);
+    }
+  };
 
   return (
     <div className="flex flex-col max-w-6xl mx-auto py-8">
@@ -72,10 +96,11 @@ export const StudentDashboard = () => {
             </div>
             <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${
               form2Status === 'Completed' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 
+              form2Status === 'Edit Requested' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 
               form2Status === 'Pending' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : 
               'bg-white/5 text-text-secondary border-white/10'
             }`}>
-              {form2Status === 'Completed' ? <CheckCircle className="w-3.5 h-3.5" /> : form2Status === 'Pending' ? <Clock className="w-3.5 h-3.5" /> : null} 
+              {form2Status === 'Completed' ? <CheckCircle className="w-3.5 h-3.5" /> : form2Status === 'Pending' ? <Clock className="w-3.5 h-3.5" /> : form2Status === 'Edit Requested' ? <Clock className="w-3.5 h-3.5" /> : null} 
               {form2Status}
             </div>
           </div>
@@ -86,9 +111,15 @@ export const StudentDashboard = () => {
           </p>
           
           <Button onClick={() => navigate('/form/first-year-data')} className="w-full group">
-            {form2Status === 'Completed' ? 'Edit Form' : 'Start Form'}
+            {form2Status === 'Completed' || form2Status === 'Edit Requested' ? 'View Form' : (form2Status === 'Pending' ? 'Edit Form' : 'Start Form')}
             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
+          
+          {form2Status === 'Completed' && (
+            <Button variant="outline" onClick={() => setIsEditModalOpen(true)} className="w-full mt-3 border-white/10 text-text-secondary hover:text-white">
+              Request Edit Access
+            </Button>
+          )}
         </Card>
 
         {/* Form 3 Card */}
@@ -141,6 +172,36 @@ export const StudentDashboard = () => {
           </div>
         </Card>
       </div>
+
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-card border border-white/10 p-6 rounded-xl w-full max-w-md shadow-2xl"
+          >
+            <h3 className="text-xl font-bold mb-4 text-white">Request Edit Access</h3>
+            <p className="text-sm text-text-secondary mb-4">
+              Please provide a valid reason for why you need to edit your application. This request will be sent to the administrator for approval.
+            </p>
+            <textarea
+              className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white placeholder-text-secondary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent mb-6"
+              rows={4}
+              placeholder="E.g., I made a typo in my name and need to correct it."
+              value={editReason}
+              onChange={(e) => setEditReason(e.target.value)}
+            />
+            <div className="flex gap-4">
+              <Button variant="outline" onClick={() => setIsEditModalOpen(false)} className="flex-1">
+                Cancel
+              </Button>
+              <Button onClick={handleRequestEdit} isLoading={isSubmittingEditRequest} className="flex-1">
+                Send Request
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
