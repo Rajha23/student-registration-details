@@ -416,6 +416,7 @@ export const AdminDashboard = () => {
                 <th className="p-4 font-medium text-text-secondary">App No.</th>
                 <th className="p-4 font-medium text-text-secondary">Name</th>
                 <th className="p-4 font-medium text-text-secondary">Email</th>
+                <th className="p-4 font-medium text-text-secondary">Date</th>
                 {activeTab === 'submissions' && <th className="p-4 font-medium text-text-secondary">Degree</th>}
                 {activeTab === 'registered' && <th className="p-4 font-medium text-text-secondary">Course</th>}
                 {activeTab === 'submissions' && <th className="p-4 font-medium text-text-secondary">Status</th>}
@@ -426,12 +427,12 @@ export const AdminDashboard = () => {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-text-secondary">Loading records...</td>
+                  <td colSpan={7} className="p-8 text-center text-text-secondary">Loading records...</td>
                 </tr>
               ) : activeTab === 'submissions' ? (
                 filteredStudents.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="p-8 text-center text-text-secondary">No records found.</td>
+                    <td colSpan={7} className="p-8 text-center text-text-secondary">No records found.</td>
                   </tr>
                 ) : (
                 filteredStudents.map((student) => (
@@ -439,6 +440,7 @@ export const AdminDashboard = () => {
                     <td className="p-4 font-medium">{student.application_number || '-'}</td>
                     <td className="p-4">{student.student_name || 'N/A'}</td>
                     <td className="p-4 text-text-secondary">{student.email}</td>
+                    <td className="p-4 text-text-secondary whitespace-nowrap">{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
                     <td className="p-4">{student.programme || '-'}</td>
                     <td className="p-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -479,7 +481,7 @@ export const AdminDashboard = () => {
               ) : (
                 filteredRegistered.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="p-8 text-center text-text-secondary">No registered profiles found.</td>
+                    <td colSpan={7} className="p-8 text-center text-text-secondary">No registered profiles found.</td>
                   </tr>
                 ) : (
                   filteredRegistered.map((student) => (
@@ -487,6 +489,7 @@ export const AdminDashboard = () => {
                       <td className="p-4 font-medium">{student.application_number || '-'}</td>
                       <td className="p-4">{student.name || 'N/A'}</td>
                       <td className="p-4 text-text-secondary">{student.email}</td>
+                      <td className="p-4 text-text-secondary whitespace-nowrap">{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
                       <td className="p-4">{student.course || '-'}</td>
                       <td className="p-4">{student.mobile_number || '-'}</td>
                       <td className="p-4 text-right whitespace-nowrap">
