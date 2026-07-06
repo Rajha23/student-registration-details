@@ -12,8 +12,8 @@ export const StudentDashboard = () => {
   const [form2Status, setForm2Status] = useState<'Not Started' | 'Pending' | 'Completed'>('Not Started');
   const [form3Status, setForm3Status] = useState<'Not Started' | 'Completed'>('Not Started');
   
-  // TODO: Replace this with your actual Google Form link
-  const GOOGLE_FORM_LINK = "https://docs.google.com/forms/";
+  // Google Form link for document submission
+  const GOOGLE_FORM_LINK = "https://docs.google.com/forms/d/1L0dCgwQah6IM5ajiKxJ5ya3iLQGvrein3K_ZLnBNDQg/viewform?ts=6a4b5ea4&edit_requested=true";
 
   useEffect(() => {
     const fn = localStorage.getItem('student_application_number');
