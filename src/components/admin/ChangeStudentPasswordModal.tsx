@@ -5,6 +5,7 @@ import { supabase } from '../../supabase/client';
 import { Input } from '../ui/Input';
 import { SearchableSelect } from '../ui/SearchableSelect';
 import { Button } from '../ui/Button';
+import { hashPassword } from '../../utils/auth';
 
 interface ChangeStudentPasswordModalProps {
   onClose: () => void;
@@ -82,7 +83,9 @@ export const ChangeStudentPasswordModal = ({ onClose, onSuccess }: ChangeStudent
         throw new Error(`Application Number ${appNumber} not found!`);
       }
       
-      if (existing.password === formData.new_password) {
+      const hashedPassword = await hashPassword(formData.new_password);
+      
+      if (existing.password === hashedPassword) {
         throw new Error("The new password is the same as the current password.");
       }
 
@@ -90,7 +93,7 @@ export const ChangeStudentPasswordModal = ({ onClose, onSuccess }: ChangeStudent
       const { error } = await supabase
         .from('student_profiles')
         .update({
-          password: formData.new_password
+          password: hashedPassword
         })
         .eq('application_number', appNumber);
 

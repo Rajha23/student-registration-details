@@ -5,6 +5,7 @@ import { supabase } from '../../supabase/client';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { Button } from '../ui/Button';
+import { hashPassword } from '../../utils/auth';
 
 interface CreateStudentModalProps {
   onClose: () => void;
@@ -87,22 +88,23 @@ export const CreateStudentModal = ({ onClose, onSuccess }: CreateStudentModalPro
         .maybeSingle();
         
       if (existing) {
-        throw new Error(`Application Number ${appNumber} is already registered!`);
+        throw new Error(`Application Number ${appNumber} already exists!`);
       }
 
-      // Create profile
-      const { error } = await supabase
-        .from('student_profiles')
-        .insert([{
-          application_number: appNumber,
-          password: formData.password,
-          name: formData.name,
-          email: formData.email,
-          mobile_number: formData.mobile_number,
-          course: formData.course,
-          department: formData.department
-        }]);
+      const hashedPassword = await hashPassword(formData.password);
 
+      // Save to student_profiles
+      const { error } = await supabase.from('student_profiles').insert({
+        id: crypto.randomUUID(),
+        application_number: appNumber,
+        name: formData.name,
+        email: formData.email,
+        mobile_number: formData.mobile_number,
+        course: formData.course,
+        department: formData.department,
+        password: hashedPassword
+      });
+      
       if (error) throw error;
       
       onSuccess();

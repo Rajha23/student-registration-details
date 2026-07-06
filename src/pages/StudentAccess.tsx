@@ -7,6 +7,7 @@ import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { Button } from '../components/ui/Button';
 import { supabase } from '../supabase/client';
+import { hashPassword } from '../utils/auth';
 
 const DEGREE_OPTIONS = [
   { value: 'B.E', label: 'B.E' },
@@ -55,13 +56,7 @@ export const StudentAccess = () => {
   const [department, setDepartment] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // Simple client-side hash function for basic obfuscation
-  const hashPassword = async (pwd: string) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(pwd);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-  };
+
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
