@@ -12,6 +12,7 @@ import { CreateAdminModal } from '../components/admin/CreateAdminModal';
 import { ChangeStudentPasswordModal } from '../components/admin/ChangeStudentPasswordModal';
 import { supabase } from '../supabase/client';
 
+
 export const AdminDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0, today: 0 });
@@ -27,6 +28,12 @@ export const AdminDashboard = () => {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [printMode, setPrintMode] = useState(false);
   const [modalViewMode, setModalViewMode] = useState<'registered' | 'full'>('full');
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const showSuccess = (msg: string) => {
+    setSuccessMessage(msg);
+    setTimeout(() => setSuccessMessage(null), 3000);
+  };
 
   useEffect(() => {
     fetchData();
@@ -539,7 +546,7 @@ export const AdminDashboard = () => {
           onSuccess={() => {
             setShowCreateStudent(false);
             fetchData();
-            alert("Student login created successfully!");
+            showSuccess("Student login created successfully!");
           }}
         />
       )}
@@ -549,7 +556,7 @@ export const AdminDashboard = () => {
           onClose={() => setShowCreateAdmin(false)}
           onSuccess={() => {
             setShowCreateAdmin(false);
-            alert("Admin profile created successfully!");
+            showSuccess("Admin profile created successfully!");
           }}
         />
       )}
@@ -559,9 +566,16 @@ export const AdminDashboard = () => {
           onClose={() => setShowChangePassword(false)}
           onSuccess={() => {
             setShowChangePassword(false);
-            alert("Student password changed successfully!");
+            showSuccess("Student password changed successfully!");
           }}
         />
+      )}
+
+      {successMessage && (
+        <div className="fixed top-4 right-4 bg-green-500/90 text-white px-6 py-3 rounded-lg shadow-2xl z-[100] flex items-center gap-3 backdrop-blur-sm border border-green-400/20">
+          <CheckCircle className="w-5 h-5" />
+          <span className="font-medium">{successMessage}</span>
+        </div>
       )}
     </div>
   );
