@@ -228,6 +228,17 @@ export const StudentAccess = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                {isLogin && (
+                  <div className="flex justify-end mt-1">
+                    <button 
+                      type="button" 
+                      onClick={() => setErrorMsg('Contact the admin to change the password')} 
+                      className="text-xs text-primary hover:text-white transition-colors"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                )}
               </div>
 
               {!isLogin && (
