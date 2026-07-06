@@ -47,6 +47,7 @@ export const FirstYearDataForm = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmittedForm, setIsSubmittedForm] = useState(false);
 
   const { register, handleSubmit, trigger, control, watch, setValue, formState: { errors } } = useForm<FirstYearDataFormData>({
     resolver: zodResolver(firstYearDataSchema),
@@ -254,6 +255,10 @@ export const FirstYearDataForm = () => {
         .maybeSingle();
         
       if (draftData) {
+        if (draftData.status === 'submitted') {
+          setIsSubmittedForm(true);
+        }
+
         Object.keys(draftData).forEach((key) => {
           if (key !== 'id' && key !== 'application_number' && key !== 'created_at' && key !== 'updated_at' && key !== 'status') {
              // @ts-ignore
@@ -459,7 +464,8 @@ export const FirstYearDataForm = () => {
               transition={{ duration: 0.3 }}
               className="space-y-6"
             >
-              {currentStep === 0 && (
+              <fieldset disabled={isSubmittedForm && !adminEditApp} className="min-w-0">
+                {currentStep === 0 && (
                 <div className="grid md:grid-cols-2 gap-6">
                   <Input label="Primary Email Address" type="email" {...register('email')} error={errors.email?.message} required className="md:col-span-2" />
                   <Input label="Student Name" {...register('student_name')} error={errors.student_name?.message} required className="md:col-span-2" />
@@ -783,6 +789,7 @@ export const FirstYearDataForm = () => {
                   <Input label="Date of Document Submission" type="date" {...register('date_of_document_submission')} error={errors.date_of_document_submission?.message} required className="md:col-span-2 mt-4" />
                 </div>
               )}
+              </fieldset>
             </motion.div>
           </AnimatePresence>
 
@@ -796,18 +803,22 @@ export const FirstYearDataForm = () => {
             </div>
             
             <div className="flex gap-4">
-              <Button type="button" variant="secondary" onClick={(e) => { e.preventDefault(); handleSaveDraft(watch()); }} isLoading={isSaving}>
-                <Save className="w-4 h-4 mr-2" /> Save Draft
-              </Button>
+              {(!isSubmittedForm || adminEditApp) && (
+                <Button type="button" variant="secondary" onClick={(e) => { e.preventDefault(); handleSaveDraft(watch()); }} isLoading={isSaving}>
+                  <Save className="w-4 h-4 mr-2" /> Save Draft
+                </Button>
+              )}
               
               {currentStep < STEPS.length - 1 ? (
                 <Button type="button" onClick={(e) => { e.preventDefault(); handleNext(); }}>
                   Next Step <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               ) : (
-                <Button type="submit" isLoading={isSubmitting} className="bg-green-600 hover:bg-green-700 shadow-[0_0_15px_rgba(22,163,74,0.3)]">
-                  <CheckCircle className="w-4 h-4 mr-2" /> Submit Application
-                </Button>
+                (!isSubmittedForm || adminEditApp) && (
+                  <Button type="submit" isLoading={isSubmitting} className="bg-green-600 hover:bg-green-700 shadow-[0_0_15px_rgba(22,163,74,0.3)]">
+                    <CheckCircle className="w-4 h-4 mr-2" /> Submit Application
+                  </Button>
+                )
               )}
             </div>
           </div>
