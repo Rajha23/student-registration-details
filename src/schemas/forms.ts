@@ -54,6 +54,8 @@ export const firstYearDataSchema = z.object({
   single_parent: z.string().min(1, "Please select Yes or No"),
   father_occupation: z.string().min(2, "Father's Occupation is required"),
   mother_occupation: z.string().min(2, "Mother's Occupation is required"),
+  guardian_name: z.string().optional(),
+  guardian_mobile: z.string().regex(/^[0-9]{10}$/, "Must be a 10-digit number").optional().or(z.literal('')),
   
   siblings_count: z.string().min(1, "Please select sibling count"),
   siblings: z.array(siblingSchema).optional(),
@@ -156,6 +158,34 @@ export const firstYearDataSchema = z.object({
     if (!data.comm_pincode || data.comm_pincode.length !== 6 || !/^\d+$/.test(data.comm_pincode)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Valid 6-digit PIN Code is required", path: ["comm_pincode"] });
     }
+  }
+  
+  // 12th Marks Total Validation
+  const inputTotal = parseInt(data.twelfth_total_marks || '0', 10);
+  let calculatedTotal = 0;
+  
+  if (data.twelfth_board === 'ICSE') {
+    if (data.icse_subjects) {
+      calculatedTotal = data.icse_subjects.reduce((sum, subj) => sum + (parseInt(subj.mark || '0', 10) || 0), 0);
+    }
+  } else {
+    const marks = [
+      data.twelfth_lang_mark,
+      data.twelfth_eng_mark,
+      data.twelfth_sub1_mark,
+      data.twelfth_sub2_mark,
+      data.twelfth_sub3_mark,
+      data.twelfth_sub4_mark,
+    ];
+    calculatedTotal = marks.reduce((sum, mark) => sum + (parseInt(mark || '0', 10) || 0), 0);
+  }
+  
+  if (inputTotal !== calculatedTotal) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Total Mark (${inputTotal}) does not match sum of subjects (${calculatedTotal})`,
+      path: ["twelfth_total_marks"],
+    });
   }
 });
 
