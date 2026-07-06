@@ -82,7 +82,7 @@ export const ChangeStudentPasswordModal = ({ onClose, onSuccess }: ChangeStudent
         throw new Error(`Application Number ${appNumber} not found!`);
       }
       
-      const hashedPassword = await hashPassword(formData.new_password);
+      const hashedPassword = await hashPassword(formData.new_password.trim());
       
       if (existing.password === hashedPassword) {
         throw new Error("The new password is the same as the current password.");

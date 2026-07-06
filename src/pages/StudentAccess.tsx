@@ -69,8 +69,8 @@ export const StudentAccess = () => {
     const formData = new FormData(e.currentTarget);
     const actualQuota = (formData.get('quota') as string) || quota;
     let actualAppNumber = (formData.get('appNumber') as string) || appNumber;
-    const actualPassword = (formData.get('password') as string) || password;
-    const actualConfirm = (formData.get('confirmPassword') as string) || confirmPassword;
+    const actualPassword = ((formData.get('password') as string) || password).trim();
+    const actualConfirm = ((formData.get('confirmPassword') as string) || confirmPassword).trim();
     
     if (!actualAppNumber.trim() || !actualPassword) return;
 
