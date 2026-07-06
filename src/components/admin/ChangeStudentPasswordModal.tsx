@@ -105,9 +105,9 @@ export const ChangeStudentPasswordModal = ({ onClose, onSuccess }: ChangeStudent
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-md bg-[#111827] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+          className="relative w-full max-w-md bg-[#111827] border border-white/10 rounded-2xl shadow-2xl"
         >
-          <div className="flex items-center justify-between p-6 border-b border-white/10 bg-white/5">
+          <div className="flex items-center justify-between p-6 border-b border-white/10 bg-white/5 rounded-t-2xl">
             <div>
               <h2 className="text-xl font-bold">Change Student Password</h2>
               <p className="text-sm text-text-secondary">Update a student's login password</p>
