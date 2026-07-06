@@ -58,19 +58,25 @@ export const StudentAccess = () => {
 
 
 
-  const handleAuth = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMsg('');
     
-    const appNumberRegex = /^[a-zA-Z0-9]{6}$/;
-    if (!appNumberRegex.test(appNumber.trim())) {
-      setErrorMsg('Application Number must be strictly 6 alphanumeric characters');
+    // Read directly from FormData to avoid React state autofill bugs
+    const formData = new FormData(e.currentTarget);
+    const actualAppNumber = (formData.get('appNumber') as string) || appNumber;
+    const actualPassword = (formData.get('password') as string) || password;
+    const actualConfirm = (formData.get('confirmPassword') as string) || confirmPassword;
+    
+    const appNumberRegex = /^[a-zA-Z0-9]{1,15}$/;
+    if (!appNumberRegex.test(actualAppNumber.trim())) {
+      setErrorMsg('Application Number must be between 1 and 15 alphanumeric characters');
       return;
     }
 
-    if (!appNumber.trim() || !password) return;
+    if (!actualAppNumber.trim() || !actualPassword) return;
     
-    if (!isLogin && password !== confirmPassword) {
+    if (!isLogin && actualPassword !== actualConfirm) {
       setErrorMsg("Passwords do not match");
       return;
     }
@@ -79,23 +85,23 @@ export const StudentAccess = () => {
     
     const isConfigured = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
     
-    if (!isConfigured) {
-      setTimeout(() => {
-        localStorage.setItem('student_application_number', appNumber.trim());
-        setIsLoading(false);
-        navigate('/dashboard');
-      }, 500);
-      return;
-    }
+      if (!isConfigured) {
+        setTimeout(() => {
+          localStorage.setItem('student_application_number', actualAppNumber.trim());
+          setIsLoading(false);
+          navigate('/dashboard');
+        }, 500);
+        return;
+      }
 
-    try {
-      const hashedPassword = await hashPassword(password.trim());
+      try {
+        const hashedPassword = await hashPassword(actualPassword.trim());
 
-      if (isLogin) {
-        const { data, error } = await supabase
-          .from('student_profiles')
-          .select('*')
-          .ilike('application_number', appNumber.trim())
+        if (isLogin) {
+          const { data, error } = await supabase
+            .from('student_profiles')
+            .select('*')
+            .ilike('application_number', actualAppNumber.trim())
           .eq('password', hashedPassword)
           .single();
           
@@ -103,18 +109,18 @@ export const StudentAccess = () => {
         
       } else {
         // Register flow
-        const { data: existingUser } = await supabase
-          .from('student_profiles')
-          .select('id')
-          .eq('application_number', appNumber.trim())
-          .maybeSingle();
+          const { data: existingUser } = await supabase
+            .from('student_profiles')
+            .select('id')
+            .eq('application_number', actualAppNumber.trim())
+            .maybeSingle();
 
-        if (existingUser) throw new Error("An account with this Application Number already exists");
+          if (existingUser) throw new Error("An account with this Application Number already exists");
 
-        // Save to student_profiles natively
-        const { error: profileError } = await supabase.from('student_profiles').insert({
-          id: crypto.randomUUID(), // Generate a UUID since we aren't using Supabase Auth anymore
-          application_number: appNumber.trim(),
+          // Save to student_profiles natively
+          const { error: profileError } = await supabase.from('student_profiles').insert({
+            id: crypto.randomUUID(), // Generate a UUID since we aren't using Supabase Auth anymore
+            application_number: actualAppNumber.trim(),
           name,
           email,
           mobile_number: mobile,
@@ -124,10 +130,10 @@ export const StudentAccess = () => {
         });
         
         if (profileError) throw profileError;
-      }
-
-      localStorage.setItem('student_application_number', appNumber.trim());
-      navigate('/dashboard');
+        }
+        
+        localStorage.setItem('student_application_number', actualAppNumber.trim());
+        navigate('/dashboard');
     } catch (err: any) {
       setErrorMsg(err.message || 'Authentication failed');
     } finally {
@@ -177,6 +183,7 @@ export const StudentAccess = () => {
               <div className={isLogin ? "md:col-span-2" : ""}>
                 <Input
                   label="Application Number"
+                  name="appNumber"
                   type="text"
                   placeholder="e.g. 123456"
                   value={appNumber}
@@ -222,6 +229,7 @@ export const StudentAccess = () => {
               <div className={isLogin ? "md:col-span-2" : ""}>
                 <Input
                   label="Password"
+                  name="password"
                   type="password"
                   placeholder="Enter your password"
                   value={password}
@@ -245,6 +253,7 @@ export const StudentAccess = () => {
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
                   <Input
                     label="Confirm Password"
+                    name="confirmPassword"
                     type="password"
                     placeholder="Re-enter password"
                     value={confirmPassword}

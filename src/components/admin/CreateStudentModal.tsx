@@ -71,9 +71,9 @@ export const CreateStudentModal = ({ onClose, onSuccess }: CreateStudentModalPro
     try {
       const appNumber = formData.application_number.trim();
       
-      const appNumberRegex = /^[a-zA-Z0-9]{6}$/;
+      const appNumberRegex = /^[a-zA-Z0-9]{1,15}$/;
       if (!appNumberRegex.test(appNumber)) {
-        throw new Error("Application Number must be strictly 6 alphanumeric characters");
+        throw new Error("Application Number must be between 1 and 15 alphanumeric characters");
       }
       
       if (formData.password.length < 6) {
