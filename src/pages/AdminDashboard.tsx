@@ -9,6 +9,7 @@ import { StudentProfileModal } from '../components/admin/StudentProfileModal';
 import { EditRegistrationModal } from '../components/admin/EditRegistrationModal';
 import { CreateStudentModal } from '../components/admin/CreateStudentModal';
 import { CreateAdminModal } from '../components/admin/CreateAdminModal';
+import { ChangeStudentPasswordModal } from '../components/admin/ChangeStudentPasswordModal';
 import { supabase } from '../supabase/client';
 
 export const AdminDashboard = () => {
@@ -23,6 +24,7 @@ export const AdminDashboard = () => {
   const [editRegistrationApp, setEditRegistrationApp] = useState<string | null>(null);
   const [showCreateStudent, setShowCreateStudent] = useState(false);
   const [showCreateAdmin, setShowCreateAdmin] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const [printMode, setPrintMode] = useState(false);
   const [modalViewMode, setModalViewMode] = useState<'registered' | 'full'>('full');
 
@@ -343,7 +345,7 @@ export const AdminDashboard = () => {
         {activeTab === 'accounts' ? (
           <div className="p-6">
             <h2 className="text-xl font-bold mb-6">Account Management</h2>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
               <Card className="p-6 bg-white/5 border-white/10 hover:bg-white/10 transition-colors">
                 <h3 className="text-lg font-bold text-primary mb-2">Student Logins</h3>
                 <p className="text-text-secondary text-sm mb-6">
@@ -351,7 +353,7 @@ export const AdminDashboard = () => {
                 </p>
                 <Button 
                   onClick={() => setShowCreateStudent(true)}
-                  className="w-full bg-primary hover:bg-primary-hover text-white"
+                  className="w-full bg-primary hover:bg-primary-hover text-white mt-auto"
                 >
                   Create Student Login
                 </Button>
@@ -364,9 +366,22 @@ export const AdminDashboard = () => {
                 </p>
                 <Button 
                   onClick={() => setShowCreateAdmin(true)}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-auto"
                 >
                   Create Admin Profile
+                </Button>
+              </Card>
+              
+              <Card className="p-6 bg-white/5 border-white/10 hover:bg-white/10 transition-colors flex flex-col">
+                <h3 className="text-lg font-bold text-red-400 mb-2">Change Password</h3>
+                <p className="text-text-secondary text-sm mb-6">
+                  Reset or change the password for an existing student account. You will need their Application Number.
+                </p>
+                <Button 
+                  onClick={() => setShowChangePassword(true)}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white mt-auto"
+                >
+                  Change Student Password
                 </Button>
               </Card>
             </div>
@@ -535,6 +550,16 @@ export const AdminDashboard = () => {
           onSuccess={() => {
             setShowCreateAdmin(false);
             alert("Admin profile created successfully!");
+          }}
+        />
+      )}
+
+      {showChangePassword && (
+        <ChangeStudentPasswordModal
+          onClose={() => setShowChangePassword(false)}
+          onSuccess={() => {
+            setShowChangePassword(false);
+            alert("Student password changed successfully!");
           }}
         />
       )}

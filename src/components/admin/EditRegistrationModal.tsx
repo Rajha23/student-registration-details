@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Loader2, Eye, EyeOff } from 'lucide-react';
+import { X, Save, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../supabase/client';
 import { Input } from '../ui/Input';
@@ -50,10 +50,8 @@ export const EditRegistrationModal = ({ applicationNumber, onClose, onSave }: Ed
     email: '',
     mobile_number: '',
     course: '',
-    department: '',
-    password: ''
+    department: ''
   });
-  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -71,8 +69,7 @@ export const EditRegistrationModal = ({ applicationNumber, onClose, onSave }: Ed
             email: data.email || '',
             mobile_number: data.mobile_number || '',
             course: data.course || '',
-            department: data.department || '',
-            password: data.password || ''
+            department: data.department || ''
           });
         }
       } catch (err) {
@@ -130,7 +127,6 @@ export const EditRegistrationModal = ({ applicationNumber, onClose, onSave }: Ed
           mobile_number: formData.mobile_number,
           course: formData.course,
           department: formData.department,
-          password: formData.password,
           updated_at: new Date().toISOString()
         })
         .eq('application_number', applicationNumber);
@@ -205,24 +201,6 @@ export const EditRegistrationModal = ({ applicationNumber, onClose, onSave }: Ed
                   onChange={handleChange} 
                   required 
                 />
-                <div className="relative">
-                  <Input 
-                    label="Password" 
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.password} 
-                    onChange={handleChange} 
-                    required 
-                    placeholder="Student Login Password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-[34px] text-text-secondary hover:text-white"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
                 <Input 
                   label="Student Name" 
                   name="name"
