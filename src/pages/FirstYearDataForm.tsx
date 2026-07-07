@@ -708,8 +708,6 @@ export const FirstYearDataForm = () => {
                         <SearchableSelect label="School" {...register('twelfth_school')} value={watch('twelfth_school')} error={errors.twelfth_school?.message} required options={twelfthSchoolOptions} disabled={!twelfthBlock} />
                       </div>
                       
-                      <Input label="12th Total Marks" readOnly {...register('twelfth_total_marks')} error={errors.twelfth_total_marks?.message} required className="bg-primary/5 cursor-not-allowed opacity-80 md:col-span-2" />
-                      
                       {watch('twelfth_board') === 'ICSE' ? (
                         <div className="col-span-1 md:col-span-2 space-y-4 border border-white/10 p-4 rounded-lg bg-white/5 mt-2">
                           <div className="flex justify-between items-center mb-2 border-b border-white/10 pb-3">
@@ -765,12 +763,14 @@ export const FirstYearDataForm = () => {
                               <Input label="Subject 4 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub4_mark')} error={errors.twelfth_sub4_mark?.message} required />
                             </div>
                           </div>
-                          
-                          <div className="mt-6 mb-4 md:w-1/2">
-                            <Input label="Total Mark" readOnly {...register('twelfth_total_marks')} error={errors.twelfth_total_marks?.message} required className="bg-primary/10 border-primary/30 text-lg font-bold cursor-not-allowed opacity-90" />
-                          </div>
                         </div>
                       )}
+                      
+                      <div className="col-span-1 md:col-span-2 mt-4 pt-4 border-t border-white/10">
+                        <div className="md:w-1/2">
+                          <Input label="12th Total Marks" readOnly {...register('twelfth_total_marks')} error={errors.twelfth_total_marks?.message} required className="bg-primary/10 border-primary/30 text-lg font-bold cursor-not-allowed opacity-90" />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
