@@ -29,6 +29,7 @@ export const AdminDashboard = () => {
   const [printMode, setPrintMode] = useState(false);
   const [modalViewMode, setModalViewMode] = useState<'registered' | 'full'>('full');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [deleteAppId, setDeleteAppId] = useState<string | null>(null);
 
   const showSuccess = (msg: string) => {
     setSuccessMessage(msg);
@@ -89,23 +90,23 @@ export const AdminDashboard = () => {
     }
   };
 
-  const handleDelete = async (applicationNumber: string) => {
-    if (!window.confirm(`Are you sure you want to permanently delete the registration for Application No. ${applicationNumber}? This action cannot be undone.`)) {
-      return;
-    }
+  const executeDelete = async () => {
+    if (!deleteAppId) return;
 
     try {
-      await supabase.from('student_documents').delete().eq('application_number', applicationNumber);
-      await supabase.from('first_year_data').delete().eq('application_number', applicationNumber);
-      const { error } = await supabase.from('student_profiles').delete().eq('application_number', applicationNumber);
+      await supabase.from('student_documents').delete().eq('application_number', deleteAppId);
+      await supabase.from('first_year_data').delete().eq('application_number', deleteAppId);
+      const { error } = await supabase.from('student_profiles').delete().eq('application_number', deleteAppId);
       
       if (error) throw error;
       
-      showSuccess(`Record ${applicationNumber} deleted successfully`);
+      showSuccess(`Registration ${deleteAppId} deleted successfully!`);
+      setDeleteAppId(null);
       fetchData();
     } catch (error) {
       console.error("Error deleting record:", error);
       alert("Failed to delete record. It might be linked to other data.");
+      setDeleteAppId(null);
     }
   };
 
@@ -519,7 +520,7 @@ export const AdminDashboard = () => {
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button variant="outline" className="text-red-400 border-red-500/30 hover:bg-red-500/20 px-3 py-1 bg-red-500/5" onClick={() => handleDelete(student.application_number)} title="Delete Record">
+                      <Button variant="outline" className="text-red-400 border-red-500/30 hover:bg-red-500/20 px-3 py-1 bg-red-500/5" onClick={() => setDeleteAppId(student.application_number)} title="Delete Record">
                         <Trash2 className="w-4 h-4 mr-2" />
                         Delete
                       </Button>
@@ -596,7 +597,7 @@ export const AdminDashboard = () => {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="outline" className="text-red-400 border-red-500/30 hover:bg-red-500/20 px-3 py-1 bg-red-500/5" onClick={() => handleDelete(student.application_number)} title="Delete Record">
+                        <Button variant="outline" className="text-red-400 border-red-500/30 hover:bg-red-500/20 px-3 py-1 bg-red-500/5" onClick={() => setDeleteAppId(student.application_number)} title="Delete Record">
                           <Trash2 className="w-4 h-4 mr-2" />
                           Delete
                         </Button>
@@ -661,6 +662,39 @@ export const AdminDashboard = () => {
             showSuccess("Student password changed successfully!");
           }}
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteAppId && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#1e232d] border border-white/10 rounded-xl max-w-md w-full shadow-2xl overflow-hidden transform transition-all">
+            <div className="p-6">
+              <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-6 h-6 text-red-500" />
+              </div>
+              <h3 className="text-xl font-bold text-center text-white mb-2">Delete Registration?</h3>
+              <p className="text-center text-text-secondary mb-6">
+                Are you absolutely sure you want to permanently delete Application <span className="font-bold text-white">{deleteAppId}</span>?<br/>This action cannot be undone.
+              </p>
+              
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  className="flex-1 border-white/10 hover:bg-white/5"
+                  onClick={() => setDeleteAppId(null)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white shadow-[0_0_15px_rgba(220,38,38,0.3)]"
+                  onClick={executeDelete}
+                >
+                  Yes, Delete
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {successMessage && (
