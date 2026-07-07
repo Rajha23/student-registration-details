@@ -487,9 +487,9 @@ export const AdminDashboard = () => {
                   <tr key={student.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                     <td className="px-2 py-3 text-xs md:text-sm font-medium">{student.application_number || '-'}</td>
                     <td className="px-2 py-3 text-xs md:text-sm">{student.student_name || 'N/A'}</td>
-                    <td className="px-2 py-3 text-xs md:text-sm text-text-secondary">{student.email}</td>
+                    <td className="px-2 py-3 text-xs md:text-sm text-text-secondary max-w-[120px] truncate" title={student.email}>{student.email}</td>
                     <td className="px-2 py-3 text-xs md:text-sm text-text-secondary whitespace-nowrap">{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
-                    <td className="px-2 py-3 text-xs md:text-sm">{student.programme || '-'}</td>
+                    <td className="px-2 py-3 text-xs md:text-sm max-w-[150px] truncate" title={student.programme || ''}>{student.programme || '-'}</td>
                     <td className="px-2 py-3 text-xs md:text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         student.status === 'submitted' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
@@ -497,7 +497,8 @@ export const AdminDashboard = () => {
                         {student.status}
                       </span>
                     </td>
-                    <td className="px-2 py-3 text-xs md:text-sm text-right whitespace-nowrap sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
+                    <td className="px-2 py-3 text-xs md:text-sm text-right sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
+                      <div className="flex flex-wrap justify-end gap-1 max-w-[150px] ml-auto">
                       <Button 
                         variant="ghost" 
                         className="text-primary hover:text-white px-3 py-1 mr-2" 
@@ -523,6 +524,7 @@ export const AdminDashboard = () => {
                         <Trash2 className="w-4 h-4 mr-2" />
                         Delete
                       </Button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -537,12 +539,13 @@ export const AdminDashboard = () => {
                     <tr key={student.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                       <td className="px-2 py-3 text-xs md:text-sm font-medium">{student.application_number || '-'}</td>
                       <td className="px-2 py-3 text-xs md:text-sm">{student.student_name ? student.student_name.split('| EDIT_REQUEST:')[0].trim() : 'N/A'}</td>
-                      <td className="px-2 py-3 text-xs md:text-sm text-text-secondary">{student.email}</td>
+                      <td className="px-2 py-3 text-xs md:text-sm text-text-secondary max-w-[120px] truncate" title={student.email}>{student.email}</td>
                       <td className="px-2 py-3 text-xs md:text-sm text-text-secondary whitespace-nowrap">{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
                       <td className="px-2 py-3 text-xs md:text-sm text-yellow-500 italic max-w-[200px] truncate" title={student.student_name ? student.student_name.split('| EDIT_REQUEST:')[1] : ''}>
                         "{student.student_name ? student.student_name.split('| EDIT_REQUEST:')[1] : ''}"
                       </td>
-                      <td className="px-2 py-3 text-xs md:text-sm text-right whitespace-nowrap sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
+                      <td className="px-2 py-3 text-xs md:text-sm text-right sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
+                        <div className="flex flex-wrap justify-end gap-1 max-w-[150px] ml-auto">
                         <Button 
                           className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 mr-2 h-8 text-sm" 
                           onClick={() => handleApproveEditRequest(student.application_number, student.student_name)}
@@ -562,6 +565,7 @@ export const AdminDashboard = () => {
                         >
                           View
                         </Button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -576,11 +580,12 @@ export const AdminDashboard = () => {
                     <tr key={student.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                       <td className="px-2 py-3 text-xs md:text-sm font-medium">{student.application_number || '-'}</td>
                       <td className="px-2 py-3 text-xs md:text-sm">{student.name || 'N/A'}</td>
-                      <td className="px-2 py-3 text-xs md:text-sm text-text-secondary">{student.email}</td>
+                      <td className="px-2 py-3 text-xs md:text-sm text-text-secondary max-w-[120px] truncate" title={student.email}>{student.email}</td>
                       <td className="px-2 py-3 text-xs md:text-sm text-text-secondary whitespace-nowrap">{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
-                      <td className="px-2 py-3 text-xs md:text-sm">{student.course || '-'}</td>
+                      <td className="px-2 py-3 text-xs md:text-sm max-w-[150px] truncate" title={student.course || ''}>{student.course || '-'}</td>
                       <td className="px-2 py-3 text-xs md:text-sm">{student.mobile_number || '-'}</td>
-                      <td className="px-2 py-3 text-xs md:text-sm text-right whitespace-nowrap sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
+                      <td className="px-2 py-3 text-xs md:text-sm text-right sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
+                        <div className="flex flex-wrap justify-end gap-1 max-w-[150px] ml-auto">
                         <Button 
                           variant="ghost" 
                           className="text-primary hover:text-white px-3 py-1 mr-2" 
@@ -600,6 +605,7 @@ export const AdminDashboard = () => {
                           <Trash2 className="w-4 h-4 mr-2" />
                           Delete
                         </Button>
+                        </div>
                       </td>
                     </tr>
                   ))
