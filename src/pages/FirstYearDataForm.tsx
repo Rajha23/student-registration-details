@@ -745,26 +745,29 @@ export const FirstYearDataForm = () => {
                               <Input label="Language Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_lang_mark')} error={errors.twelfth_lang_mark?.message} required />
                             )}
                             <Input label="English Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_eng_mark')} error={errors.twelfth_eng_mark?.message} required />
-                            <Input label="Total Mark (Out of 600)" readOnly {...register('twelfth_total_marks')} error={errors.twelfth_total_marks?.message} required className="bg-primary/5 cursor-not-allowed opacity-80" />
                           </div>
                           
                           <div className="grid md:grid-cols-2 gap-x-8 gap-y-4 mb-4 p-4 bg-white/5 rounded-lg border border-white/5">
                             <div className="grid grid-cols-2 gap-4">
-                              <Input label="Subject 1 Name" placeholder="e.g. Physics" {...register('twelfth_sub1_name')} error={errors.twelfth_sub1_name?.message} required />
+                              <Input label="Subject 1 Name" value="Physics" readOnly {...register('twelfth_sub1_name')} error={errors.twelfth_sub1_name?.message} required className="bg-white/5 cursor-not-allowed" />
                               <Input label="Subject 1 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub1_mark')} error={errors.twelfth_sub1_mark?.message} required />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                              <Input label="Subject 2 Name" placeholder="e.g. Chemistry" {...register('twelfth_sub2_name')} error={errors.twelfth_sub2_name?.message} required />
+                              <Input label="Subject 2 Name" value="Maths" readOnly {...register('twelfth_sub2_name')} error={errors.twelfth_sub2_name?.message} required className="bg-white/5 cursor-not-allowed" />
                               <Input label="Subject 2 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub2_mark')} error={errors.twelfth_sub2_mark?.message} required />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                              <Input label="Subject 3 Name" placeholder="e.g. Maths" {...register('twelfth_sub3_name')} error={errors.twelfth_sub3_name?.message} required />
+                              <Input label="Subject 3 Name" value="Chemistry" readOnly {...register('twelfth_sub3_name')} error={errors.twelfth_sub3_name?.message} required className="bg-white/5 cursor-not-allowed" />
                               <Input label="Subject 3 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub3_mark')} error={errors.twelfth_sub3_mark?.message} required />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <Input label="Subject 4 Name" placeholder="e.g. Computer Science" {...register('twelfth_sub4_name')} error={errors.twelfth_sub4_name?.message} required />
                               <Input label="Subject 4 Mark" maxLength={3} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')} {...register('twelfth_sub4_mark')} error={errors.twelfth_sub4_mark?.message} required />
                             </div>
+                          </div>
+                          
+                          <div className="mt-6 mb-4 md:w-1/2">
+                            <Input label="Total Mark" readOnly {...register('twelfth_total_marks')} error={errors.twelfth_total_marks?.message} required className="bg-primary/10 border-primary/30 text-lg font-bold cursor-not-allowed opacity-90" />
                           </div>
                         </div>
                       )}
