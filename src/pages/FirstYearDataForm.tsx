@@ -88,6 +88,8 @@ export const FirstYearDataForm = () => {
   const twelfthMarks = watch(['twelfth_lang_mark', 'twelfth_eng_mark', 'twelfth_sub1_mark', 'twelfth_sub2_mark', 'twelfth_sub3_mark', 'twelfth_sub4_mark']);
   const twelfthBoard = watch('twelfth_board');
   const icseSubjects = watch('icse_subjects');
+  const applyPmss = watch('apply_pmss_scholarship');
+  const applyBcMbc = watch('apply_bc_mbc_scholarship');
 
   const tenthDistrictOptions = Object.keys(schoolData).sort().map(d => ({ value: d, label: d }));
   const tenthBlockOptions = tenthDistrict && schoolData[tenthDistrict] 
@@ -109,6 +111,26 @@ export const FirstYearDataForm = () => {
   const prevResidence = useRef<string | undefined>(residenceType);
   const prevTransport = useRef<string | undefined>(transportMode);
   const prevCommunity = useRef<string | undefined>(community);
+  const prevPmss = useRef<string | undefined>(applyPmss);
+  const prevBcMbc = useRef<string | undefined>(applyBcMbc);
+  
+  useEffect(() => {
+    if (prevPmss.current !== undefined && prevPmss.current !== applyPmss) {
+      if (applyPmss === 'Yes') {
+        setValue('apply_bc_mbc_scholarship', 'No', { shouldValidate: true });
+      }
+    }
+    prevPmss.current = applyPmss;
+  }, [applyPmss, setValue]);
+
+  useEffect(() => {
+    if (prevBcMbc.current !== undefined && prevBcMbc.current !== applyBcMbc) {
+      if (applyBcMbc === 'Yes') {
+        setValue('apply_pmss_scholarship', 'No', { shouldValidate: true });
+      }
+    }
+    prevBcMbc.current = applyBcMbc;
+  }, [applyBcMbc, setValue]);
   
   useEffect(() => {
     if (prevCommunity.current !== undefined && prevCommunity.current !== community) {
