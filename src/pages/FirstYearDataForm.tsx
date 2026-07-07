@@ -163,16 +163,39 @@ export const FirstYearDataForm = () => {
   const icseSubjectsJson = JSON.stringify(icseSubjects);
   
   useEffect(() => {
+    let cutoff = 0;
+    
     if (twelfthBoard === 'ICSE') {
       if (icseSubjects && icseSubjects.length > 0) {
         const total = icseSubjects.reduce((sum: number, subj: any) => sum + (parseInt(subj.mark as string) || 0), 0);
         setValue('twelfth_total_marks', total.toString(), { shouldValidate: true });
+        
+        let maths = 0, physics = 0, chemistry = 0;
+        icseSubjects.forEach((subj: any) => {
+          const name = (subj.name || '').toLowerCase();
+          const mark = parseInt(subj.mark as string) || 0;
+          if (name.includes('math')) maths = mark;
+          else if (name.includes('phys')) physics = mark;
+          else if (name.includes('chem')) chemistry = mark;
+        });
+        cutoff = maths + (physics / 2) + (chemistry / 2);
       }
     } else {
       if (twelfthMarks.some(m => m !== undefined && m !== '')) {
         const total = twelfthMarks.reduce((sum, mark) => sum + (parseInt(mark as string) || 0), 0);
         setValue('twelfth_total_marks', total.toString(), { shouldValidate: true });
+        
+        const maths = parseInt(twelfthMarks[3] as string) || 0;
+        const physics = parseInt(twelfthMarks[2] as string) || 0;
+        const chemistry = parseInt(twelfthMarks[4] as string) || 0;
+        cutoff = maths + (physics / 2) + (chemistry / 2);
       }
+    }
+    
+    if (cutoff > 0) {
+      setValue('twelfth_cut_off_mark', cutoff.toString(), { shouldValidate: true });
+    } else {
+      setValue('twelfth_cut_off_mark', '', { shouldValidate: false });
     }
   }, [twelfthMarksJson, icseSubjectsJson, twelfthBoard, setValue]);
 
@@ -767,8 +790,9 @@ export const FirstYearDataForm = () => {
                       )}
                       
                       <div className="col-span-1 md:col-span-2 mt-4 pt-4 border-t border-white/10">
-                        <div className="md:w-1/2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <Input label="12th Total Marks" readOnly {...register('twelfth_total_marks')} error={errors.twelfth_total_marks?.message} required className="bg-primary/10 border-primary/30 text-lg font-bold cursor-not-allowed opacity-90" />
+                          <Input label="Engineering Cut-Off" readOnly {...register('twelfth_cut_off_mark')} error={errors.twelfth_cut_off_mark?.message} className="bg-green-500/10 border-green-500/30 text-green-400 text-lg font-bold cursor-not-allowed opacity-90" />
                         </div>
                       </div>
                     </div>

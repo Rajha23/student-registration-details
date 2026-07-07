@@ -103,6 +103,7 @@ export const firstYearDataSchema = z.object({
   twelfth_block: z.string().min(1, "12th Block is required"),
   twelfth_school: z.string().min(1, "12th School is required"),
   twelfth_total_marks: z.string().min(1, "Required").regex(/^\d+$/, "Must be a number"),
+  twelfth_cut_off_mark: z.string().optional(),
   twelfth_lang_mark: z.string().optional().refine(val => !val || (parseInt(val) >= 0 && parseInt(val) <= 100), "Max 100"),
   twelfth_eng_mark: z.string().optional().refine(val => !val || (parseInt(val) >= 0 && parseInt(val) <= 100), "Max 100"),
   twelfth_sub1_name: z.string().optional(),
