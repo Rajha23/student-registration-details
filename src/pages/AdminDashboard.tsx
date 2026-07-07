@@ -460,16 +460,16 @@ export const AdminDashboard = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-white/10">
-                <th className="p-4 font-medium text-text-secondary">App No.</th>
-                <th className="p-4 font-medium text-text-secondary">Name</th>
-                <th className="p-4 font-medium text-text-secondary">Email</th>
-                <th className="p-4 font-medium text-text-secondary">Date</th>
-                {activeTab === 'submissions' && <th className="p-4 font-medium text-text-secondary">Degree</th>}
-                {activeTab === 'registered' && <th className="p-4 font-medium text-text-secondary">Course</th>}
-                {activeTab === 'submissions' && <th className="p-4 font-medium text-text-secondary">Status</th>}
-                {activeTab === 'registered' && <th className="p-4 font-medium text-text-secondary">Mobile</th>}
-                {activeTab === 'edit_requests' && <th className="p-4 font-medium text-text-secondary">Reason</th>}
-                <th className="p-4 font-medium text-text-secondary text-right sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">Actions</th>
+                <th className="px-2 py-3 text-xs md:text-sm font-medium text-text-secondary">App No.</th>
+                <th className="px-2 py-3 text-xs md:text-sm font-medium text-text-secondary">Name</th>
+                <th className="px-2 py-3 text-xs md:text-sm font-medium text-text-secondary">Email</th>
+                <th className="px-2 py-3 text-xs md:text-sm font-medium text-text-secondary">Date</th>
+                {activeTab === 'submissions' && <th className="px-2 py-3 text-xs md:text-sm font-medium text-text-secondary">Degree</th>}
+                {activeTab === 'registered' && <th className="px-2 py-3 text-xs md:text-sm font-medium text-text-secondary">Course</th>}
+                {activeTab === 'submissions' && <th className="px-2 py-3 text-xs md:text-sm font-medium text-text-secondary">Status</th>}
+                {activeTab === 'registered' && <th className="px-2 py-3 text-xs md:text-sm font-medium text-text-secondary">Mobile</th>}
+                {activeTab === 'edit_requests' && <th className="px-2 py-3 text-xs md:text-sm font-medium text-text-secondary">Reason</th>}
+                <th className="px-2 py-3 text-xs md:text-sm font-medium text-text-secondary text-right sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -485,25 +485,25 @@ export const AdminDashboard = () => {
                 ) : (
                 regularSubmissions.map((student) => (
                   <tr key={student.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td className="p-4 font-medium">{student.application_number || '-'}</td>
-                    <td className="p-4">{student.student_name || 'N/A'}</td>
-                    <td className="p-4 text-text-secondary">{student.email}</td>
-                    <td className="p-4 text-text-secondary whitespace-nowrap">{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
-                    <td className="p-4">{student.programme || '-'}</td>
-                    <td className="p-4">
+                    <td className="px-2 py-3 text-xs md:text-sm font-medium">{student.application_number || '-'}</td>
+                    <td className="px-2 py-3 text-xs md:text-sm">{student.student_name || 'N/A'}</td>
+                    <td className="px-2 py-3 text-xs md:text-sm text-text-secondary">{student.email}</td>
+                    <td className="px-2 py-3 text-xs md:text-sm text-text-secondary whitespace-nowrap">{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
+                    <td className="px-2 py-3 text-xs md:text-sm">{student.programme || '-'}</td>
+                    <td className="px-2 py-3 text-xs md:text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         student.status === 'submitted' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
                       }`}>
                         {student.status}
                       </span>
                     </td>
-                    <td className="p-4 text-right whitespace-nowrap sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
+                    <td className="px-2 py-3 text-xs md:text-sm text-right whitespace-nowrap sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
                       <Button 
                         variant="ghost" 
                         className="text-primary hover:text-white px-3 py-1 mr-2" 
                         onClick={() => { setSelectedFolderNumber(student.application_number); setModalViewMode('full'); setPrintMode(false); }}
                       >
-                        View Form
+                        View
                       </Button>
                       <Button 
                         className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 mr-2 h-8 text-sm" 
@@ -535,14 +535,14 @@ export const AdminDashboard = () => {
                 ) : (
                   editRequests.map((student) => (
                     <tr key={student.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td className="p-4 font-medium">{student.application_number || '-'}</td>
-                      <td className="p-4">{student.student_name ? student.student_name.split('| EDIT_REQUEST:')[0].trim() : 'N/A'}</td>
-                      <td className="p-4 text-text-secondary">{student.email}</td>
-                      <td className="p-4 text-text-secondary whitespace-nowrap">{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
-                      <td className="p-4 text-yellow-500 italic max-w-[200px] truncate" title={student.student_name ? student.student_name.split('| EDIT_REQUEST:')[1] : ''}>
+                      <td className="px-2 py-3 text-xs md:text-sm font-medium">{student.application_number || '-'}</td>
+                      <td className="px-2 py-3 text-xs md:text-sm">{student.student_name ? student.student_name.split('| EDIT_REQUEST:')[0].trim() : 'N/A'}</td>
+                      <td className="px-2 py-3 text-xs md:text-sm text-text-secondary">{student.email}</td>
+                      <td className="px-2 py-3 text-xs md:text-sm text-text-secondary whitespace-nowrap">{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
+                      <td className="px-2 py-3 text-xs md:text-sm text-yellow-500 italic max-w-[200px] truncate" title={student.student_name ? student.student_name.split('| EDIT_REQUEST:')[1] : ''}>
                         "{student.student_name ? student.student_name.split('| EDIT_REQUEST:')[1] : ''}"
                       </td>
-                      <td className="p-4 text-right whitespace-nowrap sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
+                      <td className="px-2 py-3 text-xs md:text-sm text-right whitespace-nowrap sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
                         <Button 
                           className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 mr-2 h-8 text-sm" 
                           onClick={() => handleApproveEditRequest(student.application_number, student.student_name)}
@@ -560,7 +560,7 @@ export const AdminDashboard = () => {
                           className="text-primary hover:text-white px-3 py-1" 
                           onClick={() => { setSelectedFolderNumber(student.application_number); setModalViewMode('full'); setPrintMode(false); }}
                         >
-                          View Form
+                          View
                         </Button>
                       </td>
                     </tr>
@@ -574,19 +574,19 @@ export const AdminDashboard = () => {
                 ) : (
                   filteredRegistered.map((student) => (
                     <tr key={student.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td className="p-4 font-medium">{student.application_number || '-'}</td>
-                      <td className="p-4">{student.name || 'N/A'}</td>
-                      <td className="p-4 text-text-secondary">{student.email}</td>
-                      <td className="p-4 text-text-secondary whitespace-nowrap">{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
-                      <td className="p-4">{student.course || '-'}</td>
-                      <td className="p-4">{student.mobile_number || '-'}</td>
-                      <td className="p-4 text-right whitespace-nowrap sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
+                      <td className="px-2 py-3 text-xs md:text-sm font-medium">{student.application_number || '-'}</td>
+                      <td className="px-2 py-3 text-xs md:text-sm">{student.name || 'N/A'}</td>
+                      <td className="px-2 py-3 text-xs md:text-sm text-text-secondary">{student.email}</td>
+                      <td className="px-2 py-3 text-xs md:text-sm text-text-secondary whitespace-nowrap">{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
+                      <td className="px-2 py-3 text-xs md:text-sm">{student.course || '-'}</td>
+                      <td className="px-2 py-3 text-xs md:text-sm">{student.mobile_number || '-'}</td>
+                      <td className="px-2 py-3 text-xs md:text-sm text-right whitespace-nowrap sticky right-0 bg-[#111827] z-10 border-l border-white/5 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.3)]">
                         <Button 
                           variant="ghost" 
                           className="text-primary hover:text-white px-3 py-1 mr-2" 
                           onClick={() => { setSelectedFolderNumber(student.application_number); setModalViewMode('registered'); setPrintMode(false); }}
                         >
-                          View Profile
+                          View
                         </Button>
                         <Button 
                           variant="ghost" 
