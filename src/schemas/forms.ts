@@ -87,8 +87,9 @@ export const firstYearDataSchema = z.object({
   // 10th Details
   tenth_board: z.string().min(1, "Board is required"),
   tenth_medium: z.string().min(1, "Medium is required"),
+  tenth_state: z.string().min(1, "10th State is required"),
   tenth_district: z.string().min(1, "10th District is required"),
-  tenth_block: z.string().min(1, "10th Block is required"),
+  tenth_block: z.string().optional(),
   tenth_school: z.string().min(1, "10th School is required"),
   tenth_total_marks: z.string().min(1, "Required").regex(/^\d+$/, "Must be a number"),
   tenth_lang_mark: z.string().min(1, "Required").regex(/^\d+$/, "Must be a number"),
@@ -100,8 +101,9 @@ export const firstYearDataSchema = z.object({
   // 12th Details
   twelfth_board: z.string().min(1, "Board is required"),
   twelfth_medium: z.string().min(1, "Medium is required"),
+  twelfth_state: z.string().min(1, "12th State is required"),
   twelfth_district: z.string().min(1, "12th District is required"),
-  twelfth_block: z.string().min(1, "12th Block is required"),
+  twelfth_block: z.string().optional(),
   twelfth_school: z.string().min(1, "12th School is required"),
   twelfth_total_marks: z.string().min(1, "Required").regex(/^\d+$/, "Must be a number"),
   twelfth_cut_off_mark: z.string().optional(),

@@ -80,8 +80,10 @@ export const FirstYearDataForm = () => {
   const permState = watch('perm_state');
   const permPincode = watch('perm_pincode');
 
+  const tenthState = watch('tenth_state');
   const tenthDistrict = watch('tenth_district');
   const tenthBlock = watch('tenth_block');
+  const twelfthState = watch('twelfth_state');
   const twelfthDistrict = watch('twelfth_district');
   const twelfthBlock = watch('twelfth_block');
 
@@ -323,6 +325,8 @@ export const FirstYearDataForm = () => {
           setValue('blood_group', 'Other');
           setValue('custom_blood_group', draftData.blood_group);
         }
+        if (!draftData.tenth_state) setValue('tenth_state', 'Tamil Nadu');
+        if (!draftData.twelfth_state) setValue('twelfth_state', 'Tamil Nadu');
       } else {
         // No draft exists, fetch from student_profiles for pre-fill
         const { data: profileData } = await supabase
@@ -338,6 +342,9 @@ export const FirstYearDataForm = () => {
           // Map Course -> Programme/Degree and Department -> Course/Department if we stored it
           if (profileData.course) setValue('programme', profileData.course);
           if (profileData.department) setValue('course', profileData.department);
+          
+          setValue('tenth_state', 'Tamil Nadu');
+          setValue('twelfth_state', 'Tamil Nadu');
           
           if (profileData.twelfth_board === 'ICSE' && profileData.twelfth_sub1_name) {
             try {
@@ -380,8 +387,9 @@ export const FirstYearDataForm = () => {
       }
     } else if (currentStep === 2) {
       fieldsToValidate = ['religion', 'community', 'caste_name', 'father_income', 'mother_income', 'guardian_income', 'first_graduate', 'apply_pmss_scholarship', 'apply_bc_mbc_scholarship', 'emis_number', 'date_of_document_submission', 
-      'tenth_board', 'tenth_medium', 'tenth_district', 'tenth_block', 'tenth_school', 'tenth_total_marks', 'tenth_lang_mark', 'tenth_eng_mark', 'tenth_math_mark', 'tenth_sci_mark', 'tenth_soc_mark',
-      'twelfth_board', 'twelfth_medium', 'twelfth_district', 'twelfth_block', 'twelfth_school', 'twelfth_total_marks', ...(community === 'Other' ? ['community_other'] : []), ...(community !== 'OC' ? ['community_certificate_number'] : [])];
+      'tenth_state', 'tenth_board', 'tenth_medium', 'tenth_district', 'tenth_school', 'tenth_total_marks', 'tenth_lang_mark', 'tenth_eng_mark', 'tenth_math_mark', 'tenth_sci_mark', 'tenth_soc_mark',
+      'twelfth_state', 'twelfth_board', 'twelfth_medium', 'twelfth_district', 'twelfth_school', 'twelfth_total_marks', ...(community === 'Other' ? ['community_other'] : []), ...(community !== 'OC' ? ['community_certificate_number'] : []),
+      ...(tenthState === 'Tamil Nadu' ? ['tenth_block'] : []), ...(twelfthState === 'Tamil Nadu' ? ['twelfth_block'] : [])];
     }
     
     const isStepValid = await trigger(fieldsToValidate);
@@ -735,13 +743,26 @@ export const FirstYearDataForm = () => {
                   <div className="md:col-span-2 border-t border-white/10 pt-6 mt-2">
                     <h3 className="text-lg font-medium text-white mb-4">10th Standard Details</h3>
                     <div className="grid md:grid-cols-2 gap-6">
+                      <Select label="State" {...register('tenth_state')} error={errors.tenth_state?.message} required options={[{value: 'Tamil Nadu', label: 'Tamil Nadu'}, {value: 'Other', label: 'Other'}]} />
                       <Select label="Board of Education" {...register('tenth_board')} error={errors.tenth_board?.message} required options={[{value: 'State Board/Matric', label: 'State Board/Matric'}, {value: 'CBSE', label: 'CBSE'}, {value: 'ICSE', label: 'ICSE'}]} />
                       <Select label="Medium of Instruction" {...register('tenth_medium')} error={errors.tenth_medium?.message} required options={[{value: 'English', label: 'English'}, {value: 'Tamil', label: 'Tamil'}]} />
-                      <Select label="District" {...register('tenth_district')} error={errors.tenth_district?.message} required options={tenthDistrictOptions} />
-                      <Select label="Block" {...register('tenth_block')} error={errors.tenth_block?.message} required options={tenthBlockOptions} disabled={!tenthDistrict} />
-                      <div className="md:col-span-2">
-                        <SearchableSelect label="School" {...register('tenth_school')} value={watch('tenth_school')} error={errors.tenth_school?.message} required options={tenthSchoolOptions} disabled={!tenthBlock} />
-                      </div>
+                      
+                      {tenthState === 'Tamil Nadu' ? (
+                        <>
+                          <Select label="District" {...register('tenth_district')} error={errors.tenth_district?.message} required options={tenthDistrictOptions} />
+                          <Select label="Block" {...register('tenth_block')} error={errors.tenth_block?.message} required options={tenthBlockOptions} disabled={!tenthDistrict} />
+                          <div className="md:col-span-2">
+                            <SearchableSelect label="School" {...register('tenth_school')} value={watch('tenth_school')} error={errors.tenth_school?.message} required options={tenthSchoolOptions} disabled={!tenthBlock} />
+                          </div>
+                        </>
+                      ) : tenthState === 'Other' ? (
+                        <>
+                          <Input label="District" {...register('tenth_district')} error={errors.tenth_district?.message} required />
+                          <div className="md:col-span-2">
+                            <Input label="School Name" {...register('tenth_school')} error={errors.tenth_school?.message} required />
+                          </div>
+                        </>
+                      ) : null}
                       
                       <div className="md:col-span-2 mt-2">
                         <h4 className="text-sm font-medium text-text-secondary mb-3">10th Marks (Out of 100 per subject)</h4>
@@ -761,13 +782,26 @@ export const FirstYearDataForm = () => {
                     <h3 className="text-lg font-medium text-white mb-4">12th Standard Details</h3>
                     <div className="grid md:grid-cols-2 gap-6">
                       <Input label="EMIS Number" {...register('emis_number')} error={errors.emis_number?.message} required className="md:col-span-2" />
+                      <Select label="State" {...register('twelfth_state')} error={errors.twelfth_state?.message} required options={[{value: 'Tamil Nadu', label: 'Tamil Nadu'}, {value: 'Other', label: 'Other'}]} />
                       <Select label="Board of Education" {...register('twelfth_board')} error={errors.twelfth_board?.message} required options={[{value: 'State Board/Matric', label: 'State Board/Matric'}, {value: 'CBSE', label: 'CBSE'}, {value: 'ICSE', label: 'ICSE'}]} />
                       <Select label="Medium of Instruction" {...register('twelfth_medium')} error={errors.twelfth_medium?.message} required options={[{value: 'English', label: 'English'}, {value: 'Tamil', label: 'Tamil'}]} />
-                      <Select label="District" {...register('twelfth_district')} error={errors.twelfth_district?.message} required options={twelfthDistrictOptions} />
-                      <Select label="Block" {...register('twelfth_block')} error={errors.twelfth_block?.message} required options={twelfthBlockOptions} disabled={!twelfthDistrict} />
-                      <div className="md:col-span-2">
-                        <SearchableSelect label="School" {...register('twelfth_school')} value={watch('twelfth_school')} error={errors.twelfth_school?.message} required options={twelfthSchoolOptions} disabled={!twelfthBlock} />
-                      </div>
+                      
+                      {twelfthState === 'Tamil Nadu' ? (
+                        <>
+                          <Select label="District" {...register('twelfth_district')} error={errors.twelfth_district?.message} required options={twelfthDistrictOptions} />
+                          <Select label="Block" {...register('twelfth_block')} error={errors.twelfth_block?.message} required options={twelfthBlockOptions} disabled={!twelfthDistrict} />
+                          <div className="md:col-span-2">
+                            <SearchableSelect label="School" {...register('twelfth_school')} value={watch('twelfth_school')} error={errors.twelfth_school?.message} required options={twelfthSchoolOptions} disabled={!twelfthBlock} />
+                          </div>
+                        </>
+                      ) : twelfthState === 'Other' ? (
+                        <>
+                          <Input label="District" {...register('twelfth_district')} error={errors.twelfth_district?.message} required />
+                          <div className="md:col-span-2">
+                            <Input label="School Name" {...register('twelfth_school')} error={errors.twelfth_school?.message} required />
+                          </div>
+                        </>
+                      ) : null}
                       
                       {watch('twelfth_board') === 'ICSE' ? (
                         <div className="col-span-1 md:col-span-2 space-y-4 border border-white/10 p-4 rounded-lg bg-white/5 mt-2">
